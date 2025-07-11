@@ -11,6 +11,9 @@
 <body>
   <h1>Reset Your Password</h1>
   <form onsubmit="return resetPassword()">
+    <label for="email">Your email:</label>
+    <input id="email" type="email" required />
+
     <label for="new-password">New Password:</label>
     <input id="new-password" type="password" required /><br />
     <button type="submit">Change Password</button>
@@ -21,10 +24,10 @@
       const params = new URLSearchParams(window.location.search);
       const email = params.get('email'); // Get email to URL
 
-      if (!email) {
-        alert('Wrong Access');
-        return false;
-      }
+      // if (!email) {
+      //   alert('Wrong Access');
+      //   return false;
+      // }
 
       const pw = document.getElementById('new-password').value;
       // const confirmPw = document.getElementById('confirm-password').value;
