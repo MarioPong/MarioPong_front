@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Forgot Password</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div>
+    <h1 class="header">Forgot your password?</h1>
+    We'll send a link that will sign you into the app instantly.
+  </div>
+
+  <form onsubmit="return sendResetLink()">
+    <label for="reset-email">Email:</label>
+    <input id="reset-email" type="email" required />
+    <button type="submit">Send</button>
+  </form>
+
+  <script>
+    function sendResetLink() {
+      const email = document.getElementById('reset-email').value.trim();
+      if (!email) {
+        alert('이메일을 입력하세요.');
+        return false;
+      }
+
+      const emailCheck = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailCheck.test(email)) {
+        alert('유효한 이메일 형식이 아닙니다.');
+        return false;
+      }
+
+      const users = JSON.parse(localStorage.getItem('users')) || [];
+      const user = users.find(u => u.id === email);
+
+      if (!user) {
+        alert('가입된 이메일이 없습니다.');
+        return false;
+      }
+
+      // alert('재설정 링크 보냈다고 치기');
+      window.location.href = `reset_pw.html?email=${encodeURIComponent(email)}`;
+      return false;
+    }
+  </script>
+</body>
+
+</html>

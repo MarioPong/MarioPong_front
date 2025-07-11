@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="container">
+    <h1 class="header">Register</h1>
+    <form onsubmit="return registerUser()">
+
+      <div class="form-group">
+        <label for="new-email">E-mail</label>
+        <input id="new-email" type="email" placeholder="이메일" autofocus required />
+        <button type="button" onclick="checkDuplicate()">중복 확인</button>
+      </div>
+
+      <div class="form-group">
+        <label for="new-password">Password</label>
+        <input id="new-password" type="password" placeholder="비밀번호" required />
+      </div>
+
+      <div class="form-group">
+        <label for="confirm-password">Confirm Password</label>
+        <input id="confirm-password" type="password" placeholder="비밀번호 확인" required />
+      </div>
+
+      <button type="submit">Register</button>
+    </form>
+    <div class="footer-text">
+      Already have an account? <a href="login.html">Login</a>
+    </div>
+  </div>
+
+  <script>
+    let isChecked = false; // Checking Duplicated State
+
+    function checkDuplicate() {
+      const email = document.getElementById('new-email').value.trim();
+      if (!email) {
+        alert('이메일을 입력하세요.');
+        return;
+      }
+
+      const emailCheck = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailCheck.test(email)) {
+        alert('올바른 이메일 형식을 입력하세요.');
+        return;
+      }
+
+      // users array
+      let users = JSON.parse(localStorage.getItem('users')) || [];
+      const exists = users.find(user => user.id === email);
+
+      if (exists) {
+        alert('이미 존재하는 이메일입니다.');
+        isChecked = false;
+      } else {
+        alert('사용 가능한 이메일입니다.');
+        isChecked = true;
+      }
+    }
+
+    function registerUser() {
+      const id = document.getElementById('new-email').value.trim();
+      const pw = document.getElementById('new-password').value;
+      const confirmPw = document.getElementById('confirm-password').value;
+
+      if (!id || !pw || !confirmPw) {
+        alert('모든 칸을 입력하세요.');
+        return false;
+      }
+
+      if (!isChecked) {
+        alert('이메일 중복 확인을 해주세요.');
+        return false;
+      }
+
+      if (pw !== confirmPw) {
+        alert('비밀번호가 일치하지 않습니다.');
+        return false;
+      }
+
+      const pwCheck = /^(?=.*[0-9]).{6,}$/;
+      if (!pwCheck.test(pw)) {
+        alert('비밀번호는 최소 6글자 이상이며 숫자를 포함해야 합니다.');
+        return false;
+      }
+
+      // Duplicated?
+      let users = JSON.parse(localStorage.getItem('users')) || [];
+      const exists = users.find(user => user.id === id);
+      if (exists) {
+        alert('이미 존재하는 이메일입니다.');
+        return false;
+      }
+
+      users.push({ id, pw });
+      localStorage.setItem('users', JSON.stringify(users));
+
+      alert('회원가입 성공! 로그인 페이지로 이동합니다.');
+      window.location.href = 'login.html';
+      return false;
+    }
+  </script>
+</body>
+
+</html>

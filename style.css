@@ -1,5 +1,5 @@
 body {
-  background: #000;
+  background: #fff;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -8,5 +8,6 @@ body {
 }
 
 canvas {
-  border: 2px solid #fff;
+  background-color: #fff;
+  border: 2px solid black;
 }

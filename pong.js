@@ -54,13 +54,13 @@ document.body.appendChild(stopBtn);
 
 // Draw paddles
 function drawPaddle(x, y, width, height) {
-  ctx.fillStyle = "#fff";
+  ctx.fillStyle = "#000";
   ctx.fillRect(x, y, width, height);
 }
 
 // Draw ball
 function drawBall() {
-  ctx.fillStyle = "#fff";
+  ctx.fillStyle = "black";
   ctx.beginPath();
   ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
   ctx.closePath();
