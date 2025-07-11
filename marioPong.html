@@ -19,15 +19,23 @@
 
     twoPlayerBtn.addEventListener('click', () => {
       gameMode = 'two';
-      startGame();
+      // startGame();
+      window.location.href = "for2ppl.html"
     });
 
     function startGame() {
       document.querySelector('.oneOrtwo').style.display = 'none';
-      // 이제 pong.js 쪽으로 선택 모드 넘기기
-      window.initPongGame(gameMode);
+
+      // window.initPongGame(gameMode);
+
+      const script = document.createElement('script');
+      script.src = 'pong.js';
+
+      script.onload = () => {
+        window.initPongGame(gameMode);
+      };
+
+      document.body.appendChild(script);
     }
   </script>
-
-  <script src="pong.js"></script>
 </body>
