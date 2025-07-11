@@ -13,10 +13,55 @@
     <h1 class="header">Main Page</h1>
     <button onclick="startGame()">게임 시작</button>
   </div>
+  <div>
+    <button onclick="userProfile()">프로필</button>
+  </div>
+  <div>
+    <button onclick="move2store()">상점</button>
+  </div>
+  <div>
+    <button onclick="collection()">컬렉션</button>
+  </div>
+  <div>
+    <button onclick="logOut(event)">로그아웃</button>
+
+  </div>
 
   <script>
     function startGame() {
       window.location.href = 'marioPong.html';
+    }
+
+    function move2store() {
+      window.location.href = 'store.html';
+    }
+
+    function collection() {
+      window.location.href = 'collection.html';
+    }
+
+    function logOut(event) {
+      event.preventDefault();
+
+      fetch('https://mariopong-back.onrender.com/api/user/logout', {
+        method: 'GET',
+        credentials: 'include'
+      })
+        .then(res => res.json())
+        .then(result => {
+
+          if (result.success) {
+            alert('로그아웃이 완료되었습니다.');
+            window.location.href = 'login.html';
+          } else {
+            alert('로그아웃에 실패했습니다.');
+            console.log(result.message)
+          }
+        })
+        .catch(err => {
+          alert("오류가 발생했습니다");
+          console.log('네트워크 오류: ' + err.message)
+        });
     }
   </script>
 </body>

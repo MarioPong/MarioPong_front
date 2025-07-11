@@ -11,14 +11,14 @@
 <body>
   <div class="container">
     <h1 class="header">Login</h1>
-    <form onsubmit="return loginUser()">
+    <form id="loginForm" onsubmit="return loginUser(event)">
       <div class="form-group">
         <label for="email">E-mail</label>
-        <input id="email" type="email" placeholder="이메일" autofocus />
+        <input id="email" type="email" placeholder="이메일" autofocus required />
       </div>
       <div class="form-group">
         <label for="password">Password</label>
-        <input id="password" type="password" placeholder="비밀번호" />
+        <input id="password" type="password" placeholder="비밀번호" required />
       </div>
       <button type="submit">Login</button>
     </form>
@@ -29,27 +29,39 @@
   </div>
 
   <script>
-    function loginUser() {
+    document.getElementById("loginForm").addEventListener("submit", loginUser);
+
+    function loginUser(event) {
+      event.preventDefault(); // 폼 제출시 새로고침 방지
+
       const inputEmail = document.getElementById('email').value.trim();
       const inputPw = document.getElementById('password').value;
 
-      const users = JSON.parse(localStorage.getItem('users')) || [];
+      fetch('https://mariopong-back.onrender.com/api/user/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          id: inputEmail, // 또는 email: inputEmail (서버 요구에 따라)
+          password: inputPw,
+        }),
+        credentials: 'include' // 쿠키 기반 인증이 필요하다면 추가
+      })
+        .then(res => res.json())
+        .then(result => {
+          if (result.loginSuccess === true) {
+            alert('로그인 성공!');
+            location.href = 'main.html'; // 로그인 성공 후 이동
+          } else {
+            alert(result.message || '로그인 실패');
+          }
+        })
+        .catch(err => {
+          alert('네트워크 오류: ' + err.message);
+        });
 
-      if (users.length === 0) {
-        alert('가입된 계정이 없습니다. 회원가입 해주세요.');
-        return false;
-      }
-
-      const match = users.find(user => user.id === inputEmail && user.pw === inputPw);
-
-      if (match) {
-        alert('로그인 성공!');
-        window.location.href = 'main.html';
-        return false;
-      } else {
-        alert('이메일 또는 비밀번호가 틀렸습니다.');
-        return false;
-      }
+      return false; // 폼 새로고침 방지
     }
   </script>
 
