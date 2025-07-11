@@ -11,7 +11,7 @@
 <body>
   <div class="container">
     <h1 class="header">Login</h1>
-    <form id="loginForm" onsubmit="return loginUser(event)">
+    <form id="loginForm">
       <div class="form-group">
         <label for="email">E-mail</label>
         <input id="email" type="email" placeholder="이메일" autofocus required />
@@ -19,6 +19,9 @@
       <div class="form-group">
         <label for="password">Password</label>
         <input id="password" type="password" placeholder="비밀번호" required />
+      </div>
+      <div>
+        Remember password <input type="checkbox" id="rememberMe">
       </div>
       <button type="submit">Login</button>
     </form>
@@ -52,7 +55,7 @@
         .then(result => {
           if (result.loginSuccess === true) {
             alert('로그인 성공!');
-            location.href = 'main.html'; // 로그인 성공 후 이동
+            window.location.href = 'main.html'; // 로그인 성공 후 이동
           } else {
             alert(result.message || '로그인 실패');
           }
