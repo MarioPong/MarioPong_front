@@ -1,23 +1,33 @@
-<!DOCTYPE html>
-<html lang="ko">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width" , initial-scale=1.0>
-  <title>Pong Game</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-
 <body>
-
   <div class="oneOrtwo">
-    <!--<button type="submit">Login</button>
-    <button type="submit">Login</button>-->
+    <button id="onePlayerBtn">1인용</button>
+    <button id="twoPlayerBtn">2인용</button>
   </div>
 
-  <canvas id="pong" width="1200" height="675"></canvas>
+  <canvas id="pong" width="800" height="600"></canvas>
+
+  <script>
+    let gameMode = null;
+
+    const onePlayerBtn = document.getElementById('onePlayerBtn');
+    const twoPlayerBtn = document.getElementById('twoPlayerBtn');
+
+    onePlayerBtn.addEventListener('click', () => {
+      gameMode = 'one';
+      startGame();
+    });
+
+    twoPlayerBtn.addEventListener('click', () => {
+      gameMode = 'two';
+      startGame();
+    });
+
+    function startGame() {
+      document.querySelector('.oneOrtwo').style.display = 'none';
+      // 이제 pong.js 쪽으로 선택 모드 넘기기
+      window.initPongGame(gameMode);
+    }
+  </script>
 
   <script src="pong.js"></script>
 </body>
-
-</html>

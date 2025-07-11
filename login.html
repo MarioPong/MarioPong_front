@@ -39,6 +39,7 @@
 
       const inputEmail = document.getElementById('email').value.trim();
       const inputPw = document.getElementById('password').value;
+      const rememberMe = document.getElementById('rememberMe').checked;
 
       fetch('https://mariopong-back.onrender.com/api/user/login', {
         method: 'POST',
@@ -48,6 +49,7 @@
         body: JSON.stringify({
           id: inputEmail, // 또는 email: inputEmail (서버 요구에 따라)
           password: inputPw,
+          rememberMe: rememberMe
         }),
         credentials: 'include' // 쿠키 기반 인증이 필요하다면 추가
       })
