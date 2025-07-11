@@ -21,21 +21,9 @@
 
   <script>
     function resetPassword() {
-      const params = new URLSearchParams(window.location.search);
-      const email = params.get('email'); // Get email to URL
 
-      // if (!email) {
-      //   alert('Wrong Access');
-      //   return false;
-      // }
-
+      const email = document.getElementById('email').value.trim();
       const pw = document.getElementById('new-password').value;
-      // const confirmPw = document.getElementById('confirm-password').value;
-
-      if (pw !== confirmPw) {
-        alert('Passwords are not matched');
-        return false;
-      }
 
       const pwCheck = /^(?=.*[0-9]).{6,}$/;
       if (!pwCheck.test(pw)) {
@@ -51,8 +39,6 @@
         body: JSON.stringify({
           id: email,
           password: pw
-
-
         }),
         credentials: 'include' // 쿠키 기반 인증이 필요하다면 추가
       })
