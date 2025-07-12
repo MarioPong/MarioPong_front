@@ -202,6 +202,7 @@
       myPaddleIndex = idx;
     });
     socket.on('componentLeft', (id) => {
+      console.log("component left")
       if (socket.id !== id){
         socket.emit('leaveRoom', currentRoom);
         showLobby();
