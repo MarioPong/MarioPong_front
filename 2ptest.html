@@ -16,22 +16,19 @@
   </style>
 </head>
 <body>
-  <h2>Mario-Pong PvP</h2>
+  <h2>Pong PvP 방 만들기/참가 테스트</h2>
   <div class="row">
-    <label>방 이름: <input id="roomMakeInput" placeholder="방 이름을 입력하세요"></label>
+    <label>방 이름: <input id="roomInput" placeholder="방 이름 입력"></label>
     <button id="createBtn">방 만들기</button>
-    <label>방 이름: <input id="roomInput" placeholder="방 이름을 입력하세요"></label>
     <button id="joinBtn">방 참가하기</button>
     <button id="leaveBtn" disabled>방 나가기</button>
   </div>
   <button id="readyBtn" disabled>준비완료</button>
-  <button id="gameStartBtn" disabled>게임시작</button>
   <div id="status"></div>
   <div id="error"></div>
   <script>
     const socket = io('https://mariopong-back.onrender.com/pong');
     let joined = false;
-    let left = false;
     let currentRoom = null;
 
     function joinRoom(roomName) {
@@ -45,7 +42,7 @@
     }
 
     document.getElementById('createBtn').onclick = () => {
-      const roomName = document.getElementById('roomMakeInput').value.trim();
+      const roomName = document.getElementById('roomInput').value.trim();
       joinRoom(roomName);
     };
 
@@ -56,17 +53,12 @@
 
     document.getElementById('leaveBtn').onclick = () => {
       if (joined && currentRoom) {
-        const socketId = socket.id
-        socket.emit('leaveRoom', {currentRoom, socketId});
+        socket.emit('leaveRoom', currentRoom);
         document.getElementById('status').innerText = '방에서 나왔습니다.';
         document.getElementById('readyBtn').disabled = true;
         document.getElementById('leaveBtn').disabled = true;
         joined = false;
-        left = true;
         currentRoom = null;
-      }
-      else if (!left){
-        socket.emit('componentLeft', currentRoom);
       }
     };
 
@@ -82,14 +74,8 @@
       document.getElementById('status').innerText = '서버 연결 끊김';
       document.getElementById('readyBtn').disabled = true;
       document.getElementById('leaveBtn').disabled = true;
-      document.getElementById('gameStartBtn').disabled = true;
       joined = false;
       currentRoom = null;
-    });
-
-    socket.on('leftWhenReady', () => {
-      document.getElementById('status').innerText = '준비완료! 상대방을 기다리는 중...';
-      document.getElementById('gameStartBtn').disabled = true;
     });
 
     socket.on('connect_error', (err) => {
@@ -98,10 +84,9 @@
 
     socket.on('startGame', () => {
       document.getElementById('status').innerText = '플레이어 모두 준비완료!';
-      document.getElementById('gameStartBtn').disabled = false;
-      //여기에 게임 시작 코드
     });
 
+    // 방 입장 성공시 처리
     socket.on('enteredRoom', () => {
       document.getElementById('status').innerText = '방에 입장했습니다. 준비 버튼을 눌러주세요!';
       document.getElementById('readyBtn').disabled = false;
