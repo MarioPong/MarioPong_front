@@ -48,7 +48,6 @@
     let currentRoom = null;
     let myPaddleIndex = null;
 
-    // 화면 요소
     const lobbyScreen = document.getElementById('lobbyScreen');
     const gameScreen = document.getElementById('gameScreen');
     const statusDiv = document.getElementById('status');
@@ -59,10 +58,8 @@
     const canvas = document.getElementById('pongCanvas');
     const context = canvas.getContext('2d');
 
-    // 게임 상태
     let gameActive = false;
 
-    // 방 입장
     function joinRoom(roomName) {
       if (!roomName) {
         errorDiv.innerText = '방 이름을 입력하세요.';
@@ -149,7 +146,9 @@
     });
 
     socket.on('waiting', (data) => {
-      statusDiv.innerText = data.message;
+      if (socket.id === data.id){
+        statusDiv.innerText = "준비 완료! 상대방을 기다리는 중...";
+      }
     });
 
     socket.on('startGame', () => {
