@@ -171,7 +171,9 @@
       errorDiv.innerText = '연결 오류: ' + err.message;
     });
     socket.on('waiting', (data) => {
-      statusDiv.innerText = data.message;
+      if (socket.id === data.id){
+        statusDiv.innerText = "준비 완료! 상대방을 기다리는 중...";
+      }
     });
     socket.on('startGame', () => {
       showGame();
