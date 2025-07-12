@@ -1,41 +1,20 @@
-<body>
-  <div class="oneOrtwo">
-    <button id="onePlayerBtn">1인용</button>
-    <button id="twoPlayerBtn">2인용</button>
-  </div>
+<!DOCTYPE html>
+<html lang="ko">
 
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mario Pong!</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
   <canvas id="pong" width="800" height="600"></canvas>
 
+  <script src="pong.js"></script>
   <script>
-    let gameMode = null;
-
-    const onePlayerBtn = document.getElementById('onePlayerBtn');
-    const twoPlayerBtn = document.getElementById('twoPlayerBtn');
-
-    onePlayerBtn.addEventListener('click', () => {
-      gameMode = 'one';
-      startGame();
-    });
-
-    twoPlayerBtn.addEventListener('click', () => {
-      gameMode = 'two';
-      // startGame();
-      window.location.href = "for2ppl.html"
-    });
-
-    function startGame() {
-      document.querySelector('.oneOrtwo').style.display = 'none';
-
-      // window.initPongGame(gameMode);
-
-      const script = document.createElement('script');
-      script.src = 'pong.js';
-
-      script.onload = () => {
-        window.initPongGame(gameMode);
-      };
-
-      document.body.appendChild(script);
-    }
+    initPongGame();
   </script>
 </body>
+
+</html>

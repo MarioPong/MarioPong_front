@@ -1,0 +1,104 @@
+@font-face {
+  font-family: 'PixelFont';
+  src: url('./fonts/SuperMario256.ttf') format('truetype');
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'PixelFont', sans-serif;
+  background: url('./img/bg-pattern.png');
+  /* optional pattern */
+  background-size: cover;
+  color: white;
+  text-align: center;
+}
+
+.container {
+  padding: 20px;
+}
+
+.header {
+  font-size: 48px;
+  margin-bottom: 20px;
+  color: #ffdd57;
+  text-shadow: 2px 2px 4px black;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #0077cc;
+  border: 3px solid white;
+  border-radius: 10px;
+  font-size: 20px;
+  font-family: 'PixelFont', sans-serif;
+  color: white;
+  cursor: pointer;
+  margin-bottom: 30px;
+}
+
+button:hover {
+  background-color: #005fa3;
+}
+
+.photo-section {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 30px;
+  padding-bottom: 50px;
+}
+
+.photo-grid {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, 140px);
+  grid-gap: 20px;
+  padding: 0;
+  margin: 0;
+}
+
+.photo-box {
+  width: 140px;
+  height: 140px;
+  border: 4px solid white;
+  border-radius: 8px;
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.3s;
+}
+
+.photo-box:hover {
+  transform: scale(1.05);
+  opacity: 0.7;
+}
+
+.selected {
+  border-color: gold;
+}
+
+#b {
+  width: 300px;
+  height: 420px;
+  border: 6px solid white;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  position: relative;
+  transition: background 0.3s ease;
+}
+
+#b div {
+  width: 100%;
+  height: 75%;
+  background-size: cover;
+  background-position: center;
+}
+
+#b p {
+  margin: 0;
+  padding: 10px;
+  font-size: 20px;
+  color: yellow;
+  text-shadow: 1px 1px 2px black;
+}

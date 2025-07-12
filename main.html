@@ -9,36 +9,34 @@
 </head>
 
 <body>
-  <div class="container">
-    <h1 class="header">Main Page</h1>
-    <button onclick="startGame()">게임 시작</button>
-  </div>
-  <div>
-    <button onclick="userProfile()">프로필</button>
-  </div>
-  <div>
-    <button onclick="move2store()">상점</button>
-  </div>
-  <div>
-    <button onclick="collection()">컬렉션</button>
-  </div>
-  <div>
-    <button onclick="logOut(event)">로그아웃</button>
+
+  <div class="frame">
+    <div class="content">
+      <h1 class="logo">SUPER MARIO Pong!</h1>
+      <ul class="menu">
+        <li><button onclick="startGame()">1 PLAYER GAME</button></li>
+        <li><button onclick="startGame2()">2 PLAYER GAME</button></li>
+        <li><button onclick="userProfile()">PROFILE</button></li>
+        <li><button onclick="move2store()">STORE</button></li>
+        <li><button onclick="collection()">COLLECTION</button></li>
+        <li><button onclick="logOut(event)">LOGOUT</button></li>
+      </ul>
+    </div>
   </div>
 
   <script>
     function startGame() {
       window.location.href = 'marioPong.html';
     }
-
+    function startGame2() {
+      alert('2인 모드는 준비중입니다.');
+    }
     function userProfile() {
       window.location.href = 'profile.html';
     }
-
     function move2store() {
       window.location.href = 'store.html';
     }
-
     function collection() {
       window.location.href = 'collection.html';
     }

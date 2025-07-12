@@ -20,9 +20,6 @@
         <label for="password">Password</label>
         <input id="password" type="password" placeholder="비밀번호" required />
       </div>
-      <div>
-        Remember password <input type="checkbox" id="rememberMe">
-      </div>
       <button type="submit">Login</button>
     </form>
     <div class="footer-text">
@@ -49,7 +46,7 @@
         body: JSON.stringify({
           id: inputEmail, // 또는 email: inputEmail (서버 요구에 따라)
           password: inputPw,
-          rememberMe: rememberMe
+          // rememberMe: rememberMe
         }),
         credentials: 'include' // 쿠키 기반 인증이 필요하다면 추가
       })
