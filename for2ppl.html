@@ -55,7 +55,7 @@
 
     document.getElementById('leaveBtn').onclick = () => {
       if (joined && currentRoom) {
-        socket.emit('leaveRoom', currentRoom);
+        socket.emit('componentLeft', currentRoom);
         document.getElementById('status').innerText = '방에서 나왔습니다.';
         document.getElementById('readyBtn').disabled = true;
         document.getElementById('leaveBtn').disabled = true;
