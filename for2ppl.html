@@ -31,6 +31,7 @@
   <script>
     const socket = io('https://mariopong-back.onrender.com/pong');
     let joined = false;
+    let left = false;
     let currentRoom = null;
 
     function joinRoom(roomName) {
@@ -55,12 +56,17 @@
 
     document.getElementById('leaveBtn').onclick = () => {
       if (joined && currentRoom) {
-        socket.emit('componentLeft', currentRoom);
+        const socketId = socket.id
+        socket.emit('leaveRoom', {currentRoom, socketId});
         document.getElementById('status').innerText = '방에서 나왔습니다.';
         document.getElementById('readyBtn').disabled = true;
         document.getElementById('leaveBtn').disabled = true;
         joined = false;
+        left = true;
         currentRoom = null;
+      }
+      else if (!left){
+        socket.emit('componentLeft', currentRoom);
       }
     };
 
@@ -93,6 +99,7 @@
     socket.on('startGame', () => {
       document.getElementById('status').innerText = '플레이어 모두 준비완료!';
       document.getElementById('gameStartBtn').disabled = false;
+      //여기에 게임 시작 코드
     });
 
     socket.on('enteredRoom', () => {
