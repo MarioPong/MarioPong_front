@@ -1,25 +1,112 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>for2ppl</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>Pong 방 만들기/참가 테스트</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.js"
+          integrity="sha512-9mpsATI0KClwt+xVZfbcf2lJ8IFBAwsubJ6mI3rtULwyM3fBmQFzj0It4tGqxLOGQwGfJdk/G+fANnxfq9/cew=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"></script>
+  <style>
+    body { font-family: sans-serif; }
+    #status { margin-top: 20px; font-size: 1.2em; color: green; }
+    #error { color: red; }
+    .row { margin-bottom: 10px; }
+    button { margin-left: 5px; }
+  </style>
 </head>
-
 <body>
-  <div class="container">
-    <h1 class="header">for2ppl</h1>
+  <h2>Mario-Pong PvP</h2>
+  <div class="row">
+    <label>방 이름: <input id="roomMakeInput" placeholder="방 이름을 입력하세요"></label>
+    <button id="createBtn">방 만들기</button>
+    <label>방 이름: <input id="roomInput" placeholder="방 이름을 입력하세요"></label>
+    <button id="joinBtn">방 참가하기</button>
+    <button id="leaveBtn" disabled>방 나가기</button>
   </div>
+  <button id="readyBtn" disabled>준비완료</button>
+  <button id="gameStartBtn" disabled>게임시작</button>
+  <div id="status"></div>
+  <div id="error"></div>
+  <script>
+    const socket = io('https://mariopong-back.onrender.com/pong');
+    let joined = false;
+    let currentRoom = null;
 
-  <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.js"
-      integrity="sha512-9mpsATI0KClwt+xVZfbcf2lJ8IFBAwsubJ6mI3rtULwyM3fBmQFzj0It4tGqxLOGQwGfJdk/G+fANnxfq9/cew=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    ></script>
-    <script src="./2player.js"></script>
+    function joinRoom(roomName) {
+      if (!roomName) {
+        document.getElementById('error').innerText = '방 이름을 입력하세요.';
+        return;
+      }
+      socket.emit('joinRoom', roomName);
+      document.getElementById('error').innerText = '';
+      currentRoom = roomName;
+    }
+
+    document.getElementById('createBtn').onclick = () => {
+      const roomName = document.getElementById('roomMakeInput').value.trim();
+      joinRoom(roomName);
+    };
+
+    document.getElementById('joinBtn').onclick = () => {
+      const roomName = document.getElementById('roomInput').value.trim();
+      joinRoom(roomName);
+    };
+
+    document.getElementById('leaveBtn').onclick = () => {
+      if (joined && currentRoom) {
+        socket.emit('leaveRoom', currentRoom);
+        document.getElementById('status').innerText = '방에서 나왔습니다.';
+        document.getElementById('readyBtn').disabled = true;
+        document.getElementById('leaveBtn').disabled = true;
+        joined = false;
+        currentRoom = null;
+      }
+    };
+
+    socket.on('roomFull', (data) => {
+      document.getElementById('error').innerText = data.message;
+    });
+
+    socket.on('connect', () => {
+      document.getElementById('status').innerText = '서버에 연결됨';
+    });
+
+    socket.on('disconnect', () => {
+      document.getElementById('status').innerText = '서버 연결 끊김';
+      document.getElementById('readyBtn').disabled = true;
+      document.getElementById('leaveBtn').disabled = true;
+      document.getElementById('gameStartBtn').disabled = true;
+      joined = false;
+      currentRoom = null;
+    });
+
+    socket.on('leftWhenReady', () => {
+      document.getElementById('status').innerText = '준비완료! 상대방을 기다리는 중...';
+      document.getElementById('gameStartBtn').disabled = true;
+    });
+
+    socket.on('connect_error', (err) => {
+      document.getElementById('error').innerText = '연결 오류: ' + err.message;
+    });
+
+    socket.on('startGame', () => {
+      document.getElementById('status').innerText = '플레이어 모두 준비완료!';
+      document.getElementById('gameStartBtn').disabled = false;
+    });
+
+    socket.on('enteredRoom', () => {
+      document.getElementById('status').innerText = '방에 입장했습니다. 준비 버튼을 눌러주세요!';
+      document.getElementById('readyBtn').disabled = false;
+      document.getElementById('leaveBtn').disabled = false;
+      joined = true;
+    });
+
+    document.getElementById('readyBtn').onclick = () => {
+      socket.emit('ready');
+      document.getElementById('status').innerText = '준비완료! 상대방을 기다리는 중...';
+      document.getElementById('readyBtn').disabled = true;
+    };
+  </script>
 </body>
-
 </html>
