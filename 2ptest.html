@@ -201,6 +201,13 @@
     socket.on('paddleIndex', (idx) => {
       myPaddleIndex = idx;
     });
+    socket.on('componentLeft', (id) => {
+      if (socket.id !== id){
+        socket.emit('leaveRoom', currentRoom);
+        showLobby();
+      }
+      
+    });
 
     // 게임 화면 그리기 (가로형, 전체화면 대응)
     function renderGame(state) {
