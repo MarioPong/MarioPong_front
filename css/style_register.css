@@ -7,7 +7,7 @@ html {
   padding: 0;
 }
 
-.login {
+.register {
   min-height: 100vh;
   min-width: 100vw;
   background: url('../img/background_scaling_up.png') no-repeat center center fixed;
@@ -17,7 +17,7 @@ html {
   justify-content: center;
 }
 
-.login .overlap-group-wrapper {
+.register .overlap-group-wrapper {
   width: 100%;
   height: 100%;
   display: flex;
@@ -25,7 +25,7 @@ html {
   justify-content: center;
 }
 
-.login .overlap-group {
+.register .overlap-group {
   width: 100%;
   height: 100%;
   display: flex;
@@ -33,18 +33,18 @@ html {
   justify-content: center;
 }
 
-.login-card {
+.register-card {
   background: rgba(255, 255, 255, 0.9);
   border: 4px solid #7ed6f7;
   border-radius: 16px;
   padding: 40px;
-  min-width: 400px;
-  max-width: 500px;
+  min-width: 450px;
+  max-width: 550px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
 }
 
-.login-title {
+.register-title {
   font-size: 2.5rem;
   color: #2f2421;
   text-align: center;
@@ -52,7 +52,7 @@ html {
   text-shadow: 3px 3px 0 #fff, 4px 4px 0 #000;
 }
 
-.login-form {
+.register-form {
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -93,7 +93,36 @@ html {
   opacity: 0.7;
 }
 
-.login-btn {
+.email-check-group {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.email-check-group .form-input {
+  flex: 1;
+}
+
+.check-btn {
+  font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+  font-size: 0.7rem;
+  background: #f1cf53;
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  white-space: nowrap;
+}
+
+.check-btn:hover {
+  background: #e04d45;
+  color: #fff;
+  transform: scale(1.05);
+}
+
+.register-btn {
   font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
   font-size: 1.2rem;
   background: #302321;
@@ -106,70 +135,53 @@ html {
   margin-top: 10px;
 }
 
-.login-btn:hover {
+.register-btn:hover {
   background: #f1cf53;
   color: #000;
   transform: scale(1.05);
 }
 
-.login-links {
+.register-links {
   display: flex;
   flex-direction: column;
   gap: 15px;
   align-items: center;
 }
 
-.forgot-link {
-  font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
-  font-size: 0.8rem;
-  color: #302321;
-  text-decoration: none;
-  transition: color 0.2s, transform 0.1s;
-  align-items: right;
-}
-
-.register-link {
-  font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
-  font-size: 0.8rem;
-  color: #302321;
-  text-decoration: none;
-  transition: color 0.2s, transform 0.1s;
-}
-
-.forgot-link:hover,
-.register-link:hover {
-  color: #f1cf53;
-  transform: scale(1.1);
-}
-
-.forgot-section {
-  display: flex;
-  flex-direction: column;
-  align-items: right;
-  gap: 5px;
-}
-
-.register-section {
+.login-section {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 5px;
 }
 
-.register-text {
+.login-text {
   font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
   font-size: 0.7rem;
   color: #302321;
 }
 
+.login-link {
+  font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+  font-size: 0.8rem;
+  color: #302321;
+  text-decoration: none;
+  transition: color 0.2s, transform 0.1s;
+}
+
+.login-link:hover {
+  color: #f1cf53;
+  transform: scale(1.1);
+}
+
 @media (max-width: 600px) {
-  .login-card {
+  .register-card {
     min-width: 320px;
     max-width: 90vw;
     padding: 30px 20px;
   }
 
-  .login-title {
+  .register-title {
     font-size: 2rem;
   }
 
@@ -178,8 +190,18 @@ html {
     padding: 10px 12px;
   }
 
-  .login-btn {
+  .register-btn {
     font-size: 1rem;
     padding: 12px 24px;
+  }
+
+  .email-check-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .check-btn {
+    font-size: 0.6rem;
+    padding: 10px 12px;
   }
 }

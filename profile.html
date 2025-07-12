@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Store</title>
+  <title>Profile</title>
   <link rel="stylesheet" href="css/style_profile.css" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <script src="js/store.js" defer></script> <!--아직 없음-->
@@ -14,6 +14,7 @@
   <div class="store-bg">
     <div class="profile-card">
       <div class="profile-header">
+        <button class="back-btn" onclick="goBack()">← Back</button>
         <span class="profile-title">Profile</span>
         <div class="profile-coin-box">
           <img src="img/coin.png" alt="coin" class="profile-coin" />
@@ -37,6 +38,12 @@
       </div>
     </div>
   </div>
+
+  <script>
+    function goBack() {
+      window.location.href = 'main.html';
+    }
+  </script>
 </body>
 
 </html>
