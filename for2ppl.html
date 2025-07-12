@@ -56,17 +56,13 @@
 
     document.getElementById('leaveBtn').onclick = () => {
       if (joined && currentRoom) {
-        const socketId = socket.id
-        socket.emit('leaveRoom', {currentRoom, socketId});
+        socket.emit('leaveRoom', {currentRoom});
         document.getElementById('status').innerText = '방에서 나왔습니다.';
         document.getElementById('readyBtn').disabled = true;
         document.getElementById('leaveBtn').disabled = true;
         joined = false;
         left = true;
         currentRoom = null;
-      }
-      else if (!left){
-        socket.emit('componentLeft', currentRoom);
       }
     };
 
@@ -85,11 +81,6 @@
       document.getElementById('gameStartBtn').disabled = true;
       joined = false;
       currentRoom = null;
-    });
-
-    socket.on('leftWhenReady', () => {
-      document.getElementById('status').innerText = '준비완료! 상대방을 기다리는 중...';
-      document.getElementById('gameStartBtn').disabled = true;
     });
 
     socket.on('checkReady', () => {
