@@ -4,89 +4,39 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Profile</title>
-  <link rel="stylesheet" href="style_profile.css" />
+  <title>Store</title>
+  <link rel="stylesheet" href="css/style_profile.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <script src="js/store.js" defer></script> <!--아직 없음-->
 </head>
 
 <body>
-  <div class="container">
-    <h1 class="header">User Profile</h1>
-  </div>
-  <div>
-    <button onclick="reset_pw()">비밀번호 변경</button>
-  </div>
-
-  <div class="photo-section">
-    <ul class="photo-grid">
-      <li id='mario'>
-        <div class="photo-box photo-img-1"></div>
-      </li>
-      <li id='yoshi'>
-        <div class="photo-box photo-img-2"></div>
-      </li>
-      <li id='kinopio'>
-        <div class="photo-box photo-img-3"></div>
-      </li>
-      <li id='donkikong'>
-        <div class="photo-box photo-img-4"></div>
-      </li>
-      <li id='koopa'>
-        <div class="photo-box photo-img-5"></div>
-      </li>
-      <li id='peach'>
-        <div class="photo-box photo-img-6"></div>
-      </li>
-
-      <div id="b">
-        <div></div>
-        <p></p>
+  <div class="store-bg">
+    <div class="profile-card">
+      <div class="profile-header">
+        <span class="profile-title">Profile</span>
+        <div class="profile-coin-box">
+          <img src="img/coin.png" alt="coin" class="profile-coin" />
+          <span class="profile-coin-amount">500</span>
+        </div>
       </div>
-    </ul>
+      <div class="profile-content"><!--content box 크게 만들기-->
+        <div class="profile-mario-box">
+          <img src="img/mario.png" alt="Mario" class="profile-mario" />
+        </div>
+        <div class="profile-info-box">
+          <div class="profile-info profile-userid">User ID</div>
+          <div class="profile-info profile-email">User E-mail</div>
+          <div class="profile-info profile-score">Score</div>
+          <div class="profile-info profile-rank">Rank(+ user 순위)</div>
+          <div class="profile-btn-row">
+            <button class="profile-btn main">Top10</button>
+            <button class="profile-btn">전적 조회</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-  <script>
-    function reset_pw() {
-      window.location.href = 'reset_pw.html';
-    }
-
-    const photoBoxes = document.querySelectorAll('.photo-box');
-    const previewBox = document.querySelector('#b div');
-    const previewText = document.querySelector('#b p');
-
-    const characterInfo = {
-      mario: { name: '마리오', img: './img/mario.png' },
-      yoshi: { name: '요시', img: './img/yoshi.png' },
-      kinopio: { name: '키노피오', img: './img/kinopio.png' },
-      donkikong: { name: '동키콩', img: './img/donkikong.png' },
-      koopa: { name: '쿠파', img: './img/koopa.png' },
-      peach: { name: '피치 공주', img: './img/peach.png' }
-    };
-
-    photoBoxes.forEach(box => {
-      const parentLi = box.parentElement;
-      const id = parentLi.id;
-
-      // 배경 이미지 세팅
-      if (characterInfo[id]) {
-        box.style.backgroundImage = `url('${characterInfo[id].img}')`;
-      }
-
-      box.addEventListener('mouseenter', () => {
-        previewBox.style.backgroundImage = `url('${characterInfo[id].img}')`;
-        previewText.textContent = characterInfo[id].name;
-      });
-
-      box.addEventListener('mouseleave', () => {
-        previewBox.style.backgroundImage = '';
-        previewText.textContent = '';
-      });
-
-      box.addEventListener('click', () => {
-        document.querySelectorAll('.photo-box').forEach(el => el.classList.remove('selected'));
-        box.classList.add('selected');
-      });
-    });
-  </script>
-
 </body>
 
 </html>

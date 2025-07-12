@@ -4,32 +4,32 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Main</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Mario Pong Main</title>
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/style_main.css" />
+  <!-- Google Fonts: Press Start 2P -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 
 <body>
-
-  <div class="frame">
-    <div class="content">
-      <h1 class="logo">SUPER MARIO Pong!</h1>
-      <ul class="menu">
-        <li><button onclick="startGame()">1 PLAYER GAME</button></li>
-        <li><button onclick="startGame2()">2 PLAYER GAME</button></li>
-        <li><button onclick="userProfile()">PROFILE</button></li>
-        <li><button onclick="move2store()">STORE</button></li>
-        <li><button onclick="collection()">COLLECTION</button></li>
-        <li><button onclick="logOut(event)">LOGOUT</button></li>
-      </ul>
-    </div>
+  <div class="main-menu-bg">
+    <header class="main-menu-header">
+      <img src="img/title.png" alt="Mario Pong Title" class="main-menu-title-img" />
+    </header>
+    <nav class="main-menu-nav">
+      <ol class="main-menu-list">
+        <li><button onclick="startGame()"><span class='menu-num-1'>1</span> Play</button></li>
+        <li><button onclick="userProfile()"><span class='menu-num-2'>2</span> Profile</button></li>
+        <li><button onclick="move2store()"><span class='menu-num-3'>3</span> Store</button></li>
+        <li><button onclick="collection()"><span class='menu-num-4'>4</span> Collections</button></li>
+        <li><button disabled><span class='menu-num-5'>5</span> Settings</button></li>
+      </ol>
+    </nav>
+    <button class="main-menu-logout" onclick="logOut(event)">logout</button>
   </div>
-
   <script>
     function startGame() {
       window.location.href = 'marioPong.html';
-    }
-    function startGame2() {
-      alert('2인 모드는 준비중입니다.');
     }
     function userProfile() {
       window.location.href = 'profile.html';
@@ -40,17 +40,14 @@
     function collection() {
       window.location.href = 'collection.html';
     }
-
     function logOut(event) {
       event.preventDefault();
-
       fetch('https://mariopong-back.onrender.com/api/user/logout', {
         method: 'GET',
         credentials: 'include'
       })
         .then(res => res.json())
         .then(result => {
-
           if (result.success) {
             alert('로그아웃이 완료되었습니다.');
             window.location.href = 'login.html';

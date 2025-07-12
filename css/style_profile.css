@@ -1,0 +1,195 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.store-bg {
+  min-height: 100vh;
+  min-width: 100vw;
+  background: url('../img/background_scaling_up.png') no-repeat center center fixed;
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-card {
+  background: #fdf0c2;
+  border: 4px solid #7ed6f7;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px 0 #0004;
+  min-width: 600px;
+  max-width: 700px;
+  min-height: 340px;
+  padding: 32px 32px 28px 32px;
+  position: relative;
+  font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-header {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  margin-bottom: 12px;
+}
+
+.profile-title {
+  font-size: 2.2rem;
+  color: #2f2421;
+  text-shadow: 3px 3px 0 #fff, 4px 4px 0 #000;
+  font-weight: bold;
+  margin-right: 12px;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.profile-icon {
+  width: 44px;
+  height: 44px;
+  position: absolute;
+  top: -18px;
+}
+
+.profile-icon-left {
+  left: 120px;
+}
+
+.profile-icon-right {
+  right: 40px;
+}
+
+.profile-coin-box {
+  position: absolute;
+  top: -10px;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.profile-coin {
+  width: 36px;
+  height: 36px;
+  vertical-align: middle;
+}
+
+.profile-coin-amount {
+  font-size: 1.5rem;
+  color: #2f2421;
+  text-shadow: 2px 2px 0 #fff, 3px 3px 0 #000;
+  margin-left: 2px;
+}
+
+.profile-content {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 32px;
+}
+
+.profile-mario-box {
+  border: 3px solid #bdb76b;
+  border-radius: 16px;
+  background: #fffbe6;
+  padding: 12px 12px 12px 12px;
+  min-width: 170px;
+  min-height: 170px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-mario {
+  width: 120px;
+  height: auto;
+  image-rendering: pixelated;
+}
+
+.profile-info-box {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-left: 18px;
+  margin-top: 8px;
+  min-width: 260px;
+}
+
+.profile-info {
+  font-size: 1.1rem;
+  color: #2f2421;
+  text-shadow: 2px 2px 0 #fff, 3px 3px 0 #000;
+  margin-bottom: 2px;
+}
+
+.profile-btn-row {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.profile-btn {
+  font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+  font-size: 1.1rem;
+  background: #e5e5e5;
+  color: #2f2421;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 28px;
+  margin: 0;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 #bbb, 3px 3px 0 #000;
+  transition: transform 0.12s cubic-bezier(.4, 2, .6, 1), background 0.2s;
+}
+
+.profile-btn.main {
+  font-size: 1.2rem;
+  font-weight: bold;
+  background: #d3d3d3;
+}
+
+.profile-btn:hover {
+  background: #f1cf53;
+  color: #000;
+  transform: scale(1.08);
+}
+
+@media (max-width: 900px) {
+  .profile-card {
+    min-width: 320px;
+    max-width: 98vw;
+    padding: 12px 4vw;
+  }
+
+  .profile-content {
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .profile-mario-box {
+    min-width: 0;
+    padding: 8px 2px;
+  }
+
+  .profile-mario {
+    width: 80px;
+  }
+
+  .profile-info-box {
+    margin-left: 0;
+    min-width: 0;
+  }
+
+  .profile-btn-row {
+    justify-content: center;
+  }
+}
