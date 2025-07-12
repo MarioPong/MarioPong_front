@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Pong 방 만들기/참가 테스트</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.js"
+          integrity="sha512-9mpsATI0KClwt+xVZfbcf2lJ8IFBAwsubJ6mI3rtULwyM3fBmQFzj0It4tGqxLOGQwGfJdk/G+fANnxfq9/cew=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"></script>
+  <style>
+    body { font-family: sans-serif; }
+    #status { margin-top: 20px; font-size: 1.2em; color: green; }
+    #error { color: red; }
+    .row { margin-bottom: 10px; }
+    button { margin-left: 5px; }
+  </style>
+</head>
+<body>
+  <h2>Pong PvP 방 만들기/참가 테스트</h2>
+  <div class="row">
+    <label>방 이름: <input id="roomInput" placeholder="방 이름 입력"></label>
+    <button id="createBtn">방 만들기</button>
+    <button id="joinBtn">방 참가하기</button>
+  </div>
+  <button id="readyBtn" disabled>준비완료</button>
+  <div id="status"></div>
+  <div id="error"></div>
+  <script>
+    const socket = io('https://mariopong-back.onrender.com/api/user/login/pong');
+    let joined = false;
+
+    function joinRoom(roomName) {
+      if (!roomName) {
+        document.getElementById('error').innerText = '방 이름을 입력하세요.';
+        return;
+      }
+      socket.emit('joinRoom', roomName);
+      document.getElementById('error').innerText = '';
+    }
+
+    document.getElementById('createBtn').onclick = () => {
+      const roomName = document.getElementById('roomInput').value.trim();
+      joinRoom(roomName); // 실제로는 서버에서 방이 없으면 생성, 있으면 참가
+    };
+
+    document.getElementById('joinBtn').onclick = () => {
+      const roomName = document.getElementById('roomInput').value.trim();
+      joinRoom(roomName);
+    };
+
+    socket.on('roomFull', (data) => {
+      document.getElementById('error').innerText = data.message;
+    });
+
+    socket.on('connect', () => {
+      document.getElementById('status').innerText = '서버에 연결됨';
+    });
+
+    socket.on('disconnect', () => {
+      document.getElementById('status').innerText = '서버 연결 끊김';
+      document.getElementById('readyBtn').disabled = true;
+      joined = false;
+    });
+
+    socket.on('connect_error', (err) => {
+      document.getElementById('error').innerText = '연결 오류: ' + err.message;
+    });
+
+    socket.on('startGame', () => {
+      document.getElementById('status').innerText = '플레이어 모두 준비완료!';
+    });
+
+    // 방 입장 성공시 처리
+    socket.onAny((event, ...args) => {
+      if (event === 'roomFull') return;
+      if (!joined && event !== 'connect') {
+        document.getElementById('status').innerText = '방에 입장했습니다. 준비 버튼을 눌러주세요!';
+        document.getElementById('readyBtn').disabled = false;
+        joined = true;
+      }
+    });
+
+    document.getElementById('readyBtn').onclick = () => {
+      socket.emit('ready');
+      document.getElementById('status').innerText = '준비완료! 상대방을 기다리는 중...';
+      document.getElementById('readyBtn').disabled = true;
+    };
+  </script>
+</body>
+</html>
