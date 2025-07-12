@@ -2,19 +2,46 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>Pong PvP</title>
+  <title>Pong PvP (가로 전체화면)</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.js"
           integrity="sha512-9mpsATI0KClwt+xVZfbcf2lJ8IFBAwsubJ6mI3rtULwyM3fBmQFzj0It4tGqxLOGQwGfJdk/G+fANnxfq9/cew=="
           crossorigin="anonymous"
           referrerpolicy="no-referrer"></script>
   <style>
-    body { font-family: sans-serif; background: #222; color: #fff; }
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #222;
+      color: #fff;
+      font-family: sans-serif;
+    }
+    #lobbyScreen, #gameScreen {
+      position: absolute;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #222;
+    }
+    #gameScreen { display: none; }
     #status { margin-top: 20px; font-size: 1.2em; color: #3fcf3f; }
     #error { color: #ff5555; }
     .row { margin-bottom: 10px; }
     button { margin-left: 5px; }
-    #gameScreen { text-align: center; }
-    #pongCanvas { background: #000; display: block; margin: 0 auto; border: 2px solid #fff; }
+    #pongCanvas {
+      display: block;
+      background: #000;
+      border: 2px solid #fff;
+      width: 100vw;
+      height: 100vh;
+      max-width: 100vw;
+      max-height: 100vh;
+      touch-action: none;
+    }
   </style>
 </head>
 <body>
@@ -22,9 +49,8 @@
   <div id="lobbyScreen">
     <h2>Pong PvP 준비 화면</h2>
     <div class="row">
-      <label>방 이름: <input id="roomMakingInput" placeholder="방 이름 입력"></label>
-      <button id="createBtn">방 만들기</button>
       <label>방 이름: <input id="roomInput" placeholder="방 이름 입력"></label>
+      <button id="createBtn">방 만들기</button>
       <button id="joinBtn">방 참가하기</button>
       <button id="leaveBtn" disabled>방 나가기</button>
       <button id="readyBtn" disabled>준비완료</button>
@@ -33,21 +59,23 @@
     <div id="error"></div>
   </div>
 
-  <!-- 게임 화면 (초기에는 숨김) -->
-  <div id="gameScreen" style="display:none;">
+  <!-- 게임 화면 -->
+  <div id="gameScreen">
     <h2>Pong 게임 화면</h2>
-    <canvas id="pongCanvas" width="500" height="700"></canvas>
+    <canvas id="pongCanvas"></canvas>
     <br>
     <button id="exitGameBtn">게임 나가기</button>
   </div>
 
   <script>
     // 소켓 연결
-    const socket = io('https://mariopong-back.onrender.com/pong');
+    const socket = io('/pong');
     let joined = false;
     let currentRoom = null;
     let myPaddleIndex = null;
+    let gameActive = false;
 
+    // 화면 요소
     const lobbyScreen = document.getElementById('lobbyScreen');
     const gameScreen = document.getElementById('gameScreen');
     const statusDiv = document.getElementById('status');
@@ -58,8 +86,15 @@
     const canvas = document.getElementById('pongCanvas');
     const context = canvas.getContext('2d');
 
-    let gameActive = false;
+    // 반응형 크기 설정
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
 
+    // 방 입장
     function joinRoom(roomName) {
       if (!roomName) {
         errorDiv.innerText = '방 이름을 입력하세요.';
@@ -69,14 +104,12 @@
       errorDiv.innerText = '';
       currentRoom = roomName;
     }
-
     document.getElementById('createBtn').onclick = () => {
-      joinRoom(document.getElementById('roomMakingInput').value.trim());
+      joinRoom(document.getElementById('roomInput').value.trim());
     };
     document.getElementById('joinBtn').onclick = () => {
       joinRoom(document.getElementById('roomInput').value.trim());
     };
-
     leaveBtn.onclick = () => {
       if (joined && currentRoom) {
         socket.emit('leaveRoom', currentRoom);
@@ -87,51 +120,45 @@
         currentRoom = null;
       }
     };
-
     readyBtn.onclick = () => {
       socket.emit('ready');
       statusDiv.innerText = '준비완료! 상대방을 기다리는 중...';
       readyBtn.disabled = true;
     };
-
     exitGameBtn.onclick = () => {
-      // 게임 종료 시 방을 떠나고 로비로 복귀
       socket.emit('leaveRoom', currentRoom);
       showLobby();
     };
 
     function showLobby() {
       gameScreen.style.display = 'none';
-      lobbyScreen.style.display = 'block';
+      lobbyScreen.style.display = 'flex';
       readyBtn.disabled = false;
       leaveBtn.disabled = false;
       statusDiv.innerText = '';
       gameActive = false;
       context.clearRect(0, 0, canvas.width, canvas.height);
     }
-
     function showGame() {
       lobbyScreen.style.display = 'none';
-      gameScreen.style.display = 'block';
+      gameScreen.style.display = 'flex';
       gameActive = true;
+      resizeCanvas();
     }
 
     // 소켓 이벤트
     socket.on('roomFull', (data) => {
       errorDiv.innerText = data.message;
     });
-
     socket.on('enteredRoom', () => {
       statusDiv.innerText = '방에 입장했습니다. 준비 버튼을 눌러주세요!';
       readyBtn.disabled = false;
       leaveBtn.disabled = false;
       joined = true;
     });
-
     socket.on('connect', () => {
       statusDiv.innerText = '서버에 연결됨';
     });
-
     socket.on('disconnect', () => {
       statusDiv.innerText = '서버 연결 끊김';
       readyBtn.disabled = true;
@@ -140,81 +167,101 @@
       currentRoom = null;
       showLobby();
     });
-
     socket.on('connect_error', (err) => {
       errorDiv.innerText = '연결 오류: ' + err.message;
     });
-
     socket.on('waiting', (data) => {
-      if (socket.id === data.id){
-        statusDiv.innerText = "준비 완료! 상대방을 기다리는 중...";
-      }
+      statusDiv.innerText = data.message;
     });
-
     socket.on('startGame', () => {
       showGame();
       statusDiv.innerText = '';
-      // 내 패들 인덱스(방 참가 순서) 구하기
       socket.emit('getPaddleIndex', currentRoom);
     });
-
-    // 서버 referee 구조: 서버에서 gameState를 주기적으로 브로드캐스트
     socket.on('gameState', (state) => {
       renderGame(state);
     });
-
-    // 내 패들 인덱스 받기 (서버에서 구현 필요!)
     socket.on('paddleIndex', (idx) => {
       myPaddleIndex = idx;
     });
 
-    // 게임 화면 그리기
+    // 게임 화면 그리기 (가로형, 전체화면 대응)
     function renderGame(state) {
       context.clearRect(0, 0, canvas.width, canvas.height);
+
+      // 비율 기반 크기 계산
+      const cw = canvas.width, ch = canvas.height;
+      const paddleWidth = cw * 0.02;
+      const paddleHeight = ch * 0.15;
+      const ballRadius = Math.min(cw, ch) * 0.02;
+
+      // 패들 위치 변환 (서버는 700x500 기준, 클라에서 비율로 변환)
+      const paddleY0 = state.paddleY ? state.paddleY[0] / 500 * ch : ch / 2 - paddleHeight / 2;
+      const paddleY1 = state.paddleY ? state.paddleY[1] / 500 * ch : ch / 2 - paddleHeight / 2;
+      const paddleX0 = cw * 0.03;
+      const paddleX1 = cw - paddleWidth - cw * 0.03;
+
       // 배경
       context.fillStyle = 'black';
-      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.fillRect(0, 0, cw, ch);
 
-      // 패들
-      context.fillStyle = 'white';
-      context.fillRect(state.paddleX[0], canvas.height - 20, state.paddleWidth, state.paddleHeight); // bottom
-      context.fillRect(state.paddleX[1], 10, state.paddleWidth, state.paddleHeight); // top
-
-      // 센터 라인
+      // 센터 세로선
       context.beginPath();
       context.setLineDash([4]);
-      context.moveTo(0, canvas.height / 2);
-      context.lineTo(canvas.width, canvas.height / 2);
+      context.moveTo(cw / 2, 0);
+      context.lineTo(cw / 2, ch);
       context.strokeStyle = 'grey';
       context.stroke();
 
+      // 패들
+      context.setLineDash([]);
+      context.fillStyle = 'white';
+      context.fillRect(paddleX0, paddleY0, paddleWidth, paddleHeight); // 왼쪽
+      context.fillRect(paddleX1, paddleY1, paddleWidth, paddleHeight); // 오른쪽
+
       // 공
+      const ballX = (state.ballX / 700) * cw;
+      const ballY = (state.ballY / 500) * ch;
       context.beginPath();
-      context.arc(state.ballX, state.ballY, state.ballRadius, 0, 2 * Math.PI, false);
+      context.arc(ballX, ballY, ballRadius, 0, 2 * Math.PI, false);
       context.fillStyle = 'white';
       context.fill();
 
       // 점수
-      context.font = "32px Courier New";
-      context.fillText(state.score[0], 20, (canvas.height / 2) + 50);
-      context.fillText(state.score[1], 20, (canvas.height / 2) - 30);
+      context.font = `${Math.floor(ch * 0.08)}px Courier New`;
+      context.fillText(state.score ? state.score[0] : 0, cw * 0.25, ch * 0.1);
+      context.fillText(state.score ? state.score[1] : 0, cw * 0.75, ch * 0.1);
     }
 
-    // 패들 조작(마우스)
+    // 패들 조작(마우스 Y축 → 패들 Y좌표)
     canvas.addEventListener('mousemove', (e) => {
       if (!gameActive || myPaddleIndex === null) return;
-      // 캔버스 내 좌표로 변환
       const rect = canvas.getBoundingClientRect();
-      let x = e.clientX - rect.left;
+      let y = e.clientY - rect.top;
       // 패들이 캔버스를 넘지 않게
-      x = Math.max(0, Math.min(x, canvas.width - 50));
-      socket.emit('paddleMove', { xPosition: x });
+      const ch = canvas.height;
+      const paddleHeight = ch * 0.15;
+      y = Math.max(0, Math.min(y, ch - paddleHeight));
+      // 서버는 500 기준이므로 비율 변환
+      const yServer = y / ch * 500;
+      socket.emit('paddleMove', { yPosition: yServer });
     });
 
-    // 서버에서 내 패들 인덱스를 알려주는 이벤트가 없다면, 아래처럼 구현해도 됨
-    // (방 입장 순서대로 0, 1 할당)
+    // 터치 대응 (모바일)
+    canvas.addEventListener('touchmove', (e) => {
+      if (!gameActive || myPaddleIndex === null) return;
+      const rect = canvas.getBoundingClientRect();
+      let y = e.touches[0].clientY - rect.top;
+      const ch = canvas.height;
+      const paddleHeight = ch * 0.15;
+      y = Math.max(0, Math.min(y, ch - paddleHeight));
+      const yServer = y / ch * 500;
+      socket.emit('paddleMove', { yPosition: yServer });
+      e.preventDefault();
+    }, { passive: false });
 
-    // 기타 서버에서 추가로 leftWhenReady, notReady 등 이벤트도 처리할 수 있습니다.
+    // 최초 리사이즈
+    window.addEventListener('DOMContentLoaded', resizeCanvas);
 
   </script>
 </body>

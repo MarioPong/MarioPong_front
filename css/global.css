@@ -7,9 +7,18 @@
 
 html,
 body {
-  margin: 0px;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
   /* Do not set background or font-family here, handled in style.css */
+}
+#pongCanvas {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  background: #000;
 }
 
 button:focus-visible {

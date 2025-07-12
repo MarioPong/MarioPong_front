@@ -2,115 +2,230 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>Pong 방 만들기/참가 테스트</title>
+  <title>Pong PvP</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.js"
           integrity="sha512-9mpsATI0KClwt+xVZfbcf2lJ8IFBAwsubJ6mI3rtULwyM3fBmQFzj0It4tGqxLOGQwGfJdk/G+fANnxfq9/cew=="
           crossorigin="anonymous"
           referrerpolicy="no-referrer"></script>
   <style>
-    body { font-family: sans-serif; }
-    #status { margin-top: 20px; font-size: 1.2em; color: green; }
-    #error { color: red; }
+    body { font-family: sans-serif; background: #222; color: #fff; }
+    #status { margin-top: 20px; font-size: 1.2em; color: #3fcf3f; }
+    #error { color: #ff5555; }
     .row { margin-bottom: 10px; }
     button { margin-left: 5px; }
+    #gameScreen { text-align: center; }
+    #pongCanvas { background: #000; display: block; margin: 0 auto; border: 2px solid #fff; }
   </style>
 </head>
 <body>
-  <h2>Mario-Pong PvP</h2>
-  <div class="row">
-    <label>방 이름: <input id="roomMakeInput" placeholder="방 이름을 입력하세요"></label>
-    <button id="createBtn">방 만들기</button>
-    <label>방 이름: <input id="roomInput" placeholder="방 이름을 입력하세요"></label>
-    <button id="joinBtn">방 참가하기</button>
-    <button id="leaveBtn" disabled>방 나가기</button>
+  <!-- 준비/매칭 화면 -->
+  <div id="lobbyScreen">
+    <h2>Pong PvP 준비 화면</h2>
+    <div class="row">
+      <label>방 이름: <input id="roomMakingInput" placeholder="방 이름 입력"></label>
+      <button id="createBtn">방 만들기</button>
+      <label>방 이름: <input id="roomInput" placeholder="방 이름 입력"></label>
+      <button id="joinBtn">방 참가하기</button>
+      <button id="leaveBtn" disabled>방 나가기</button>
+      <button id="readyBtn" disabled>준비완료</button>
+    </div>
+    <div id="status"></div>
+    <div id="error"></div>
   </div>
-  <button id="readyBtn" disabled>준비완료</button>
-  <button id="gameStartBtn" disabled>게임시작</button>
-  <div id="status"></div>
-  <div id="error"></div>
+
+  <!-- 게임 화면 (초기에는 숨김) -->
+  <div id="gameScreen" style="display:none;">
+    <h2>Pong 게임 화면</h2>
+    <canvas id="pongCanvas"></canvas>
+    <br>
+    <button id="exitGameBtn">게임 나가기</button>
+  </div>
+
   <script>
+    // 소켓 연결
     const socket = io('https://mariopong-back.onrender.com/pong');
     let joined = false;
-    let left = false;
     let currentRoom = null;
+    let myPaddleIndex = null;
+
+    const lobbyScreen = document.getElementById('lobbyScreen');
+    const gameScreen = document.getElementById('gameScreen');
+    const statusDiv = document.getElementById('status');
+    const errorDiv = document.getElementById('error');
+    const readyBtn = document.getElementById('readyBtn');
+    const leaveBtn = document.getElementById('leaveBtn');
+    const exitGameBtn = document.getElementById('exitGameBtn');
+    const canvas = document.getElementById('pongCanvas');
+    const context = canvas.getContext('2d');
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      
+      renderGame();
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    let gameActive = false;
 
     function joinRoom(roomName) {
       if (!roomName) {
-        document.getElementById('error').innerText = '방 이름을 입력하세요.';
+        errorDiv.innerText = '방 이름을 입력하세요.';
         return;
       }
       socket.emit('joinRoom', roomName);
-      document.getElementById('error').innerText = '';
+      errorDiv.innerText = '';
       currentRoom = roomName;
     }
 
     document.getElementById('createBtn').onclick = () => {
-      const roomName = document.getElementById('roomMakeInput').value.trim();
-      joinRoom(roomName);
+      joinRoom(document.getElementById('roomMakingInput').value.trim());
     };
-
     document.getElementById('joinBtn').onclick = () => {
-      const roomName = document.getElementById('roomInput').value.trim();
-      joinRoom(roomName);
+      joinRoom(document.getElementById('roomInput').value.trim());
     };
 
-    document.getElementById('leaveBtn').onclick = () => {
+    leaveBtn.onclick = () => {
       if (joined && currentRoom) {
-        socket.emit('leaveRoom', {currentRoom});
-        document.getElementById('status').innerText = '방에서 나왔습니다.';
-        document.getElementById('readyBtn').disabled = true;
-        document.getElementById('leaveBtn').disabled = true;
+        socket.emit('leaveRoom', currentRoom);
+        statusDiv.innerText = '방에서 나왔습니다.';
+        readyBtn.disabled = true;
+        leaveBtn.disabled = true;
         joined = false;
-        left = true;
         currentRoom = null;
-        document.getElementById('roomMakeInput').innerText = ''
-        document.getElementById('roomInput').innerText = ''
       }
     };
 
+    readyBtn.onclick = () => {
+      socket.emit('ready');
+      statusDiv.innerText = '준비완료! 상대방을 기다리는 중...';
+      readyBtn.disabled = true;
+    };
+
+    exitGameBtn.onclick = () => {
+      // 게임 종료 시 방을 떠나고 로비로 복귀
+      socket.emit('leaveRoom', currentRoom);
+      showLobby();
+    };
+
+    function showLobby() {
+      gameScreen.style.display = 'none';
+      lobbyScreen.style.display = 'block';
+      readyBtn.disabled = false;
+      leaveBtn.disabled = false;
+      statusDiv.innerText = '';
+      gameActive = false;
+      context.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function showGame() {
+      lobbyScreen.style.display = 'none';
+      gameScreen.style.display = 'block';
+      gameActive = true;
+    }
+
+    // 소켓 이벤트
     socket.on('roomFull', (data) => {
-      document.getElementById('error').innerText = data.message;
-    });
-
-    socket.on('connect', () => {
-      document.getElementById('status').innerText = '서버에 연결됨';
-    });
-
-    socket.on('disconnect', () => {
-      document.getElementById('status').innerText = '서버 연결 끊김';
-      document.getElementById('readyBtn').disabled = true;
-      document.getElementById('leaveBtn').disabled = true;
-      document.getElementById('gameStartBtn').disabled = true;
-      joined = false;
-      currentRoom = null;
-    });
-
-    socket.on('checkReady', () => {
-      socket.emit('checkReady')
-    });
-
-    socket.on('connect_error', (err) => {
-      document.getElementById('error').innerText = '연결 오류: ' + err.message;
-    });
-
-    socket.on('startGame', () => {
-      document.getElementById('status').innerText = '플레이어 모두 준비완료!';
-      document.getElementById('gameStartBtn').disabled = false;
-      //여기에 게임 시작 코드
+      errorDiv.innerText = data.message;
     });
 
     socket.on('enteredRoom', () => {
-      document.getElementById('status').innerText = '방에 입장했습니다. 준비 버튼을 눌러주세요!';
-      document.getElementById('readyBtn').disabled = false;
-      document.getElementById('leaveBtn').disabled = false;
+      statusDiv.innerText = '방에 입장했습니다. 준비 버튼을 눌러주세요!';
+      readyBtn.disabled = false;
+      leaveBtn.disabled = false;
       joined = true;
     });
 
-    document.getElementById('readyBtn').onclick = () => {
-      socket.emit('ready');
-      document.getElementById('status').innerText = '준비완료! 상대방을 기다리는 중...';
-      document.getElementById('readyBtn').disabled = true;
-    };
+    socket.on('connect', () => {
+      statusDiv.innerText = '서버에 연결됨';
+    });
+
+    socket.on('disconnect', () => {
+      statusDiv.innerText = '서버 연결 끊김';
+      readyBtn.disabled = true;
+      leaveBtn.disabled = true;
+      joined = false;
+      currentRoom = null;
+      showLobby();
+    });
+
+    socket.on('connect_error', (err) => {
+      errorDiv.innerText = '연결 오류: ' + err.message;
+    });
+
+    socket.on('waiting', (data) => {
+      if (socket.id === data.id){
+        statusDiv.innerText = "준비 완료! 상대방을 기다리는 중...";
+      }
+    });
+
+    socket.on('startGame', () => {
+      showGame();
+      statusDiv.innerText = '';
+      // 내 패들 인덱스(방 참가 순서) 구하기
+      socket.emit('getPaddleIndex', currentRoom);
+    });
+
+    // 서버 referee 구조: 서버에서 gameState를 주기적으로 브로드캐스트
+    socket.on('gameState', (state) => {
+      renderGame(state);
+    });
+
+    // 내 패들 인덱스 받기 (서버에서 구현 필요!)
+    socket.on('paddleIndex', (idx) => {
+      myPaddleIndex = idx;
+    });
+
+    // 게임 화면 그리기
+    function renderGame(state) {
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      // 배경
+      context.fillStyle = 'black';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+
+      // 패들
+      context.fillStyle = 'white';
+      context.fillRect(state.paddleX[0], canvas.height - 20, state.paddleWidth, state.paddleHeight); // bottom
+      context.fillRect(state.paddleX[1], 10, state.paddleWidth, state.paddleHeight); // top
+
+      // 센터 라인
+      context.beginPath();
+      context.setLineDash([4]);
+      context.moveTo(0, canvas.height / 2);
+      context.lineTo(canvas.width, canvas.height / 2);
+      context.strokeStyle = 'grey';
+      context.stroke();
+
+      // 공
+      context.beginPath();
+      context.arc(state.ballX, state.ballY, state.ballRadius, 0, 2 * Math.PI, false);
+      context.fillStyle = 'white';
+      context.fill();
+
+      // 점수
+      context.font = "32px Courier New";
+      context.fillText(state.score[0], 20, (canvas.height / 2) + 50);
+      context.fillText(state.score[1], 20, (canvas.height / 2) - 30);
+    }
+
+    // 패들 조작(마우스)
+    canvas.addEventListener('mousemove', (e) => {
+      if (!gameActive || myPaddleIndex === null) return;
+      // 캔버스 내 좌표로 변환
+      const rect = canvas.getBoundingClientRect();
+      let x = e.clientX - rect.left;
+      // 패들이 캔버스를 넘지 않게
+      x = Math.max(0, Math.min(x, canvas.width - 50));
+      socket.emit('paddleMove', { xPosition: x });
+    });
+
+    // 서버에서 내 패들 인덱스를 알려주는 이벤트가 없다면, 아래처럼 구현해도 됨
+    // (방 입장 순서대로 0, 1 할당)
+
+    // 기타 서버에서 추가로 leftWhenReady, notReady 등 이벤트도 처리할 수 있습니다.
+
   </script>
 </body>
 </html>
