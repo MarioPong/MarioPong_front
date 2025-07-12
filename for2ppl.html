@@ -92,6 +92,10 @@
       document.getElementById('gameStartBtn').disabled = true;
     });
 
+    socket.on('checkReady', () => {
+      socket.emit('checkReady')
+    });
+
     socket.on('connect_error', (err) => {
       document.getElementById('error').innerText = '연결 오류: ' + err.message;
     });
