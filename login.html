@@ -70,7 +70,7 @@
             localStorage.setItem('userName', result.username);
             localStorage.setItem('gold', result.gold);
             localStorage.setItem('score', result.score);
-            localStorage.setItem('characters', result.characters);
+            localStorage.setItem('characters', JSON.stringify(result.characters));
             window.location.href = 'main.html';
           } else {
             alert(result.message || '로그인 실패');

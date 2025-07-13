@@ -41,6 +41,7 @@
       <button id="leaveBtn" disabled>방 나가기</button>
       <button id="readyBtn" disabled>준비완료</button>
     </div>
+    <div id="roomInfoBox" style="margin-bottom:16px; font-size:1.1em;"></div>
     <div id="status"></div>
     <div id="error"></div>
   </div>
@@ -77,6 +78,8 @@
     let myPaddleIndex = null;
     let gameActive = false;
     let playerIndex = 2;
+    let userName =  localStorage.getItem('userName');
+    let characters =  JSON.parse(localStorage.getItem('characters') || '[]');
 
     // 화면 요소
     const lobbyScreen = document.getElementById('lobbyScreen');
@@ -98,6 +101,7 @@
     const isReadyDiv = document.getElementById('isReady');
     const getReadyBtn = document.getElementById('getReadyBtn');
     const returnBtn = document.getElementById('returnBtn');
+    const roomInfoBox = document.getElementById('roomInfoBox');
 
     function resizeCanvas() {
       canvas.width = window.innerWidth;
@@ -111,7 +115,7 @@
         errorDiv.innerText = '방 이름을 입력하세요.';
         return;
       }
-      socket.emit('joinRoom', roomName);
+      socket.emit('joinRoom', roomName, userName);
       errorDiv.innerText = '';
       currentRoom = roomName;
     }
@@ -129,6 +133,7 @@
         leaveBtn.disabled = true;
         joined = false;
         currentRoom = null;
+        showLobby();
       }
     };
     readyBtn.onclick = () => {
@@ -160,6 +165,7 @@
       context.clearRect(0, 0, canvas.width, canvas.height);
       hideResultModal();
       hideRoomModal();
+      roomInfoBox.style.display = 'none';
     }
     function showGame() {
       lobbyScreen.style.display = 'none';
@@ -225,7 +231,9 @@
       errorDiv.innerText = '연결 오류: ' + err.message;
     });
     socket.on('waiting', (data) => {
-      statusDiv.innerText = '상대방을 기다리는 중...';
+      if (socket.id === data){
+        statusDiv.innerText = '준비완료! 상대방을 기다리는 중...';
+      }
     });
     socket.on('startGame', () => {
       showGame();
@@ -242,6 +250,39 @@
       gameActive = false;
       showResultModal(data.winner, data.score);
     });
+    socket.on('componentLeft', (id) => {
+      if (socket.id !== id){
+        socket.emit('leaveRoom', currentRoom);
+        showLobby();
+      }
+    });
+    socket.on('roomInfo', (players) => {
+      if (!players || players.length === 0) {
+        roomInfoBox.innerHTML = '';
+        return;
+      }
+      let html = `<strong>방 이름: ${currentRoom}</strong><br>`;
+      players.forEach((p, i) => {
+        // 내 소켓 ID와 비교해 내 영역에만 select 표시
+        if (p.id === socket.id) {
+          html += `P${i+1}: ${p.userName} (${p.ready ? '✅' : '❌'})<br>`;
+          html += `<select id="characterSelect">
+            ${characters.map(ch => `<option value="${ch}" ${p.character === ch ? 'selected' : ''}>${ch}</option>`).join('')}
+          </select><br>`;
+        } else {
+          html += `P${i+1}: ${p.nickname} (${p.ready ? '✅' : '❌'}) - <span>${p.character || '미선택'}</span><br>`;
+        }
+      });
+      roomInfoBox.innerHTML = html;
+
+      const select = document.getElementById('characterSelect');
+      if (select) {
+        select.onchange = function() {
+          socket.emit('selectCharacter', select.value);
+        };
+      }
+    });
+
 
     // 게임 화면
     function renderGame(state) {
