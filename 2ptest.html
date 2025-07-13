@@ -137,7 +137,8 @@
       }
     };
     readyBtn.onclick = () => {
-      socket.emit('ready');
+      const character_selected = localStorage.getItem('character_now');
+      socket.emit('ready', character_selected);
       statusDiv.innerText = '준비완료! 상대방을 기다리는 중...';
       readyBtn.disabled = true;
     };
