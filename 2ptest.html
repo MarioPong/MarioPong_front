@@ -79,6 +79,7 @@
     let gameActive = false;
     let playerIndex = 2;
     let userName =  localStorage.getItem('userName');
+    let characters =  JSON.parse(localStorage.getItem('characters') || '[]');
 
     // 화면 요소
     const lobbyScreen = document.getElementById('lobbyScreen');
@@ -132,6 +133,7 @@
         leaveBtn.disabled = true;
         joined = false;
         currentRoom = null;
+        showLobby();
       }
     };
     readyBtn.onclick = () => {
@@ -260,12 +262,27 @@
         return;
       }
       let html = `<strong>방 이름: ${currentRoom}</strong><br>`;
-      html += players.map((p, i) => 
-        `P${i+1}: ${p.userName} ${p.ready ? '✅' : '❌'}`
-      ).join('<br>');
+      players.forEach((p, i) => {
+        // 내 소켓 ID와 비교해 내 영역에만 select 표시
+        if (p.id === socket.id) {
+          html += `P${i+1}: ${p.userName} (${p.ready ? '✅' : '❌'})<br>`;
+          html += `<select id="characterSelect">
+            ${characters.map(ch => `<option value="${ch}" ${p.character === ch ? 'selected' : ''}>${ch}</option>`).join('')}
+          </select><br>`;
+        } else {
+          html += `P${i+1}: ${p.nickname} (${p.ready ? '✅' : '❌'}) - <span>${p.character || '미선택'}</span><br>`;
+        }
+      });
       roomInfoBox.innerHTML = html;
-      roomInfoBox.style.display = 'block';
+
+      const select = document.getElementById('characterSelect');
+      if (select) {
+        select.onchange = function() {
+          socket.emit('selectCharacter', select.value);
+        };
+      }
     });
+
 
     // 게임 화면
     function renderGame(state) {
