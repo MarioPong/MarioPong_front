@@ -24,6 +24,17 @@ html {
   text-align: center;
 }
 
+#userName {
+  font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+  font-size: 3rem;
+  color: #000;
+  margin-bottom: 15px;
+  display: inline-block;
+  font-weight: bold;
+}
+
+
+
 .main-menu-title-img {
   display: block;
   margin: 0 auto 30px auto;
@@ -116,4 +127,22 @@ html {
   background: none !important;
   color: #fff;
   transform: scale(1.18);
+}
+
+@media (max-width: 768px) {
+  #userName {
+    font-size: 1.2rem;
+    padding: 10px 20px;
+    margin-bottom: 15px;
+  }
+
+  .main-menu-list button {
+    font-size: 3.5vw;
+  }
+
+  .main-menu-logout {
+    font-size: 1.5vw;
+    bottom: 20px;
+    right: 20px;
+  }
 }

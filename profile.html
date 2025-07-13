@@ -26,13 +26,29 @@
           <img src="img/character/mario.png" alt="Mario" class="profile-mario" />
         </div>
         <div class="profile-info-box">
-          <div class="profile-info profile-userid">User ID</div>
-          <div class="profile-info profile-email">User E-mail</div>
-          <div class="profile-info profile-score">Score</div>
-          <div class="profile-info profile-rank">Rank(+ user 순위)</div>
+          <div class="profile-info profile-userid">
+            <span>ID</span>
+            <!--local-->
+            <span class="profile-value-display" id="profileUserName"></span>
+          </div>
+
+          <div class="profile-info profile-email">
+            <span>E-mail</span>
+            <!--local-->
+            <span class="profile-value-display" id="profileUserId"></span>
+          </div>
+
+          <div class="profile-info profile-score">
+            <span>Score</span>
+          </div>
+
+          <div class="profile-info profile-rank">
+            <span>Rank</span>
+          </div>
+
           <div class="profile-btn-row">
             <button class="profile-btn main">Top10</button>
-            <button class="profile-btn">전적 조회</button>
+            <button class="profile-btn">Records</button>
           </div>
         </div>
       </div>
@@ -40,6 +56,19 @@
   </div>
 
   <script>
+    // 사용자 닉네임 이메일 설정
+    let userName = localStorage.getItem('userName');
+    let userId = localStorage.getItem('userId');
+    let userEmail = localStorage.getItem('userEmail');
+
+    const profileUserName = document.getElementById('profileUserName');
+    const profileUserId = document.getElementById('profileUserId');
+    const profileUserEmail = document.getElementById('profileUserEmail');
+
+    profileUserName.innerText = userName;
+    profileUserId.innerText = userId;
+    profileUserEmail.innerText = userEmail;
+
     function goBack() {
       window.location.href = 'main.html';
     }

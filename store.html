@@ -42,8 +42,10 @@
         </div>
         <div class="character-detail-info">
           <div class="character-detail-name" id="modalCharacterName">Name: </div>
+          <div class="character-detail-skill-label" id="modalSkillLabel">Skill:</div>
+          <div class="character-detail-skill-text" id="modalSkillText"></div>
           <div class="character-detail-skill-label">Description:</div>
-          <div class="character-detail-skill-box" id="modalSkill1"></div>
+          <div class="character-detail-description" id="modalDescription"></div>
         </div>
         <div class="character-detail-item">
           <img id="modalItemImg" src="img/item/mushroom.png" alt="item" class="character-detail-item-img" />
@@ -65,7 +67,7 @@
       { key: 'yoshi', name: 'Yoshi', img: 'img/character/yoshi.png', price: 700 },
       { key: 'koopa', name: 'Koopa', img: 'img/character/koopa.png', price: 1000 },
       { key: 'kinopio', name: 'Kinopio', img: 'img/character/kinopio.png', price: 1200 },
-      { key: 'donkikong', name: 'Donkikong', img: 'img/character/donkikong.png', price: 1500 },
+      { key: 'donkikong', name: 'Donkey Kong', img: 'img/character/donkikong.png', price: 1500 },
       { key: 'peach', name: 'Princess Peach', img: 'img/character/princess_peach.png', price: 2000 }
     ];
     document.getElementById('coinAmount').textContent = user.coins;
@@ -117,19 +119,43 @@
         mario: 'Mario is a cheerful and heroic plumber known for his bravery, jumping skills, and versatility in sports and adventures across the Mushroom Kingdom.',
         donkikong: 'Donkey Kong is a powerful jungle king with a love for bananas and a signature red necktie, known for his immense strength and barrel-throwing.',
         yoshi: 'Yoshi is a kind, green dinosaur from Yoshi\'s Island who uses his tongue to eat enemies and turn them into eggs.',
-        koopa: 'Bowser is the fire-breathing King of the Koopas and Mario\'s main rival, constantly threatening the Mushroom Kingdom with his powerful minions.',
+        koopa: 'Koopa is the fire-breathing King of the Koopas and Mario\'s main rival, constantly threatening the Mushroom Kingdom with his powerful minions.',
         kinopio: 'Toad is a cheerful and loyal servant of Princess Peach who supports Mario and Luigi, often risking himself to help protect the kingdom.',
         peach: 'Princess Peach is the kind-hearted ruler of the Mushroom Kingdom who loves baking, sports, and working toward harmony for all.'
       };
 
       const description = characterDescriptions[char.key] || '';
-      const skillBox = document.getElementById('modalSkill1');
-      skillBox.textContent = description;
-      skillBox.style.padding = '16px';
-      skillBox.style.lineHeight = '1.4';
-      skillBox.style.textAlign = 'left';
-      skillBox.style.whiteSpace = 'normal';
-      skillBox.style.wordWrap = 'break-word';
+      const skillText = document.getElementById('modalSkillText');
+      const descriptionElement = document.getElementById('modalDescription');
+
+      // Skill names and descriptions for each character
+      const skillNames = {
+        mario: 'Red Mushroom',
+        yoshi: 'Super Shell',
+        kinopio: 'Squid',
+        donkikong: 'Triple Shell',
+        koopa: 'Fire Flower',
+        peach: 'Mini Mushroom'
+      };
+
+      const skillDescriptions = {
+        mario: 'His racket becomes larger.',
+        yoshi: 'Opponent\'s movement slows down next turn (shocked).',
+        kinopio: 'Temporarily blocks the opponent\'s vision with ink.',
+        donkikong: 'Throws 2 fake balls along with the real one.',
+        koopa: 'Throws a fast fireball.',
+        peach: 'Shrinks the opponent\'s racket size.'
+      };
+
+      const skillName = skillNames[char.key] || 'Unknown Skill';
+      const skillDescription = skillDescriptions[char.key] || 'No skill available';
+
+      // Update skill label to include skill name
+      document.getElementById('modalSkillLabel').textContent = `Skill: ${skillName}`;
+      skillText.textContent = skillDescription;
+
+      // Description without gray box
+      descriptionElement.textContent = description;
 
       // Use unique item image if available, else fallback
       const itemImg = itemImages[char.key] || 'img/item/mushroom.png';
