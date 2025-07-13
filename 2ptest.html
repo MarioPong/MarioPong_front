@@ -60,12 +60,23 @@
     </div>
   </div>
 
+  <!-- 방 생성 창 -->
+  <div id="roomModal">
+    <div id="roomBox">
+      <h2 id="roomTitle"></h2>
+      <p id="roomName"></p>
+      <div id="isReady"></div>
+      <button id="getReadyBtn">준비완료</button>
+      <button id="returnBtn">방 나가기</button>
+    </div>
+
   <script>
     const socket = io('https://mariopong-back.onrender.com/pong');
     let joined = false;
     let currentRoom = null;
     let myPaddleIndex = null;
     let gameActive = false;
+    let playerIndex = 2;
 
     // 화면 요소
     const lobbyScreen = document.getElementById('lobbyScreen');
@@ -81,6 +92,12 @@
     const resultTitle = document.getElementById('resultTitle');
     const resultScore = document.getElementById('resultScore');
     const toLobbyBtn = document.getElementById('toLobbyBtn');
+    const roomModal = document.getElementById('roomModal');
+    const roomTitle = document.getElementById('roomTitle');
+    const roomName = document.getElementById('roomName');
+    const isReadyDiv = document.getElementById('isReady');
+    const getReadyBtn = document.getElementById('getReadyBtn');
+    const returnBtn = document.getElementById('returnBtn');
 
     function resizeCanvas() {
       canvas.width = window.innerWidth;
@@ -123,6 +140,15 @@
       socket.emit('leaveRoom', currentRoom);
       showLobby();
     };
+    getReadyBtn.onclick = () => {
+      socket.emit('ready');
+      isReadyDiv.innerText = '준비완료! 상대방을 기다리는 중...';
+      getReadyBtn.disabled = true;
+    };
+    returnBtn.onclick = () => {
+      socket.emit('leaveRoom', currentRoom);
+      showLobby();
+    };
 
     function showLobby() {
       gameScreen.style.display = 'none';
@@ -133,6 +159,7 @@
       gameActive = false;
       context.clearRect(0, 0, canvas.width, canvas.height);
       hideResultModal();
+      hideRoomModal();
     }
     function showGame() {
       lobbyScreen.style.display = 'none';
@@ -154,15 +181,34 @@
       showLobby();
     };
 
+    // 방 모달
+    function showRoomModal(roomn, players) {
+      roomTitle.innerText = `방 이름 : ${roomn}`;
+      if (players.length()>1) {
+        roomName.innerText = `참가자: ${players[0]}, ${players[1]}`;
+      }
+      else {
+        roomName.innerText = `참가자: ${score[0]}`;
+      }
+      roomModal.style.display = 'flex';
+    }
+    function hideRoomModal() {
+      roomModal.style.display = 'none';
+    }
+    returnBtn.onclick = () => {
+      showLobby();
+    };
+
     // 소켓 이벤트
     socket.on('roomFull', (data) => {
       errorDiv.innerText = data.message;
     });
-    socket.on('enteredRoom', () => {
+    socket.on('enteredRoom', (index) => {
       statusDiv.innerText = '방에 입장했습니다. 준비 버튼을 눌러주세요!';
       readyBtn.disabled = false;
       leaveBtn.disabled = false;
       joined = true;
+      playerIndex = index;
     });
     socket.on('connect', () => {
       statusDiv.innerText = '서버에 연결됨';
@@ -197,7 +243,7 @@
       showResultModal(data.winner, data.score);
     });
 
-    // 게임 화면 그리기 (가로형, 전체화면 대응)
+    // 게임 화면
     function renderGame(state) {
       context.clearRect(0, 0, canvas.width, canvas.height);
 
