@@ -41,6 +41,7 @@
       <button id="leaveBtn" disabled>방 나가기</button>
       <button id="readyBtn" disabled>준비완료</button>
     </div>
+    <div id="roomInfoBox" style="margin-bottom:16px; font-size:1.1em;"></div>
     <div id="status"></div>
     <div id="error"></div>
   </div>
@@ -77,6 +78,7 @@
     let myPaddleIndex = null;
     let gameActive = false;
     let playerIndex = 2;
+    let userName =  localStorage.getItem('userName');
 
     // 화면 요소
     const lobbyScreen = document.getElementById('lobbyScreen');
@@ -98,6 +100,7 @@
     const isReadyDiv = document.getElementById('isReady');
     const getReadyBtn = document.getElementById('getReadyBtn');
     const returnBtn = document.getElementById('returnBtn');
+    const roomInfoBox = document.getElementById('roomInfoBox');
 
     function resizeCanvas() {
       canvas.width = window.innerWidth;
@@ -111,7 +114,7 @@
         errorDiv.innerText = '방 이름을 입력하세요.';
         return;
       }
-      socket.emit('joinRoom', roomName);
+      socket.emit('joinRoom', roomName, userName);
       errorDiv.innerText = '';
       currentRoom = roomName;
     }
@@ -160,6 +163,7 @@
       context.clearRect(0, 0, canvas.width, canvas.height);
       hideResultModal();
       hideRoomModal();
+      roomInfoBox.style.display = 'none';
     }
     function showGame() {
       lobbyScreen.style.display = 'none';
@@ -249,6 +253,18 @@
         socket.emit('leaveRoom', currentRoom);
         showLobby();
       }
+    });
+    socket.on('roomInfo', (players) => {
+      if (!players || players.length === 0) {
+        roomInfoBox.innerHTML = '';
+        return;
+      }
+      let html = `<strong>방 이름: ${currentRoom}</strong><br>`;
+      html += players.map((p, i) => 
+        `P${i+1}: ${p.userName} ${p.ready ? '✅' : '❌'}`
+      ).join('<br>');
+      roomInfoBox.innerHTML = html;
+      roomInfoBox.style.display = 'block';
     });
 
     // 게임 화면
