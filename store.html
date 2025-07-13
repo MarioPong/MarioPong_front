@@ -42,10 +42,8 @@
         </div>
         <div class="character-detail-info">
           <div class="character-detail-name" id="modalCharacterName">Name: </div>
-          <div class="character-detail-skill-label">Skill:</div>
+          <div class="character-detail-skill-label">Description:</div>
           <div class="character-detail-skill-box" id="modalSkill1"></div>
-          <div class="character-detail-skill-label">Skill:</div>
-          <div class="character-detail-skill-box" id="modalSkill2"></div>
         </div>
         <div class="character-detail-item">
           <img id="modalItemImg" src="img/item/mushroom.png" alt="item" class="character-detail-item-img" />
@@ -105,19 +103,41 @@
 
     // Modal logic
     function openCharacterModal(char, owned) {
+      console.log('Opening modal for:', char.name); // 디버깅용
+
       document.getElementById('modalCharacterImg').src = char.img || '';
       document.getElementById('modalCharacterImg').alt = char.name;
       document.getElementById('modalCharacterName').textContent = `Name: ${char.name}`;
       document.getElementById('modalCoinAmount').textContent = user.coins;
       document.getElementById('modalOwnedLabel').textContent = owned ? 'Owned' : '';
       document.getElementById('modalOwnedLabel').style.display = owned ? 'block' : 'none';
-      // Placeholder for skills, can be filled from server later
-      document.getElementById('modalSkill1').textContent = '';
-      document.getElementById('modalSkill2').textContent = '';
+
+      // Character descriptions
+      const characterDescriptions = {
+        mario: 'Mario is a cheerful and heroic plumber known for his bravery, jumping skills, and versatility in sports and adventures across the Mushroom Kingdom.',
+        donkikong: 'Donkey Kong is a powerful jungle king with a love for bananas and a signature red necktie, known for his immense strength and barrel-throwing.',
+        yoshi: 'Yoshi is a kind, green dinosaur from Yoshi\'s Island who uses his tongue to eat enemies and turn them into eggs.',
+        koopa: 'Bowser is the fire-breathing King of the Koopas and Mario\'s main rival, constantly threatening the Mushroom Kingdom with his powerful minions.',
+        kinopio: 'Toad is a cheerful and loyal servant of Princess Peach who supports Mario and Luigi, often risking himself to help protect the kingdom.',
+        peach: 'Princess Peach is the kind-hearted ruler of the Mushroom Kingdom who loves baking, sports, and working toward harmony for all.'
+      };
+
+      const description = characterDescriptions[char.key] || '';
+      const skillBox = document.getElementById('modalSkill1');
+      skillBox.textContent = description;
+      skillBox.style.padding = '16px';
+      skillBox.style.lineHeight = '1.4';
+      skillBox.style.textAlign = 'left';
+      skillBox.style.whiteSpace = 'normal';
+      skillBox.style.wordWrap = 'break-word';
+
       // Use unique item image if available, else fallback
       const itemImg = itemImages[char.key] || 'img/item/mushroom.png';
       document.getElementById('modalItemImg').src = itemImg;
-      document.getElementById('characterDetailModal').style.display = 'flex';
+
+      const modal = document.getElementById('characterDetailModal');
+      modal.style.display = 'flex';
+      console.log('Modal display set to flex'); // 디버깅용
     }
     function closeCharacterModal() {
       document.getElementById('characterDetailModal').style.display = 'none';

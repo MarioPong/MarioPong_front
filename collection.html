@@ -52,7 +52,7 @@
           ${char.img ? `<img src="${char.img}" alt="${char.name}" class="character-img" />` : `<div class='character-placeholder'>?</div>`}
         </div>
         <div class="character-footer owned">
-          <span class="owned-label">Owned</span>
+          <span class="owned-label">${char.name}</span>
         </div>
       `;
       list.appendChild(card);
