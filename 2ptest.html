@@ -270,7 +270,7 @@
             ${characters.map(ch => `<option value="${ch}" ${p.character === ch ? 'selected' : ''}>${ch}</option>`).join('')}
           </select><br>`;
         } else {
-          html += `P${i+1}: ${p.nickname} (${p.ready ? '✅' : '❌'}) - <span>${p.character || '미선택'}</span><br>`;
+          html += `P${i+1}: ${p.userName} (${p.ready ? '✅' : '❌'}) - <span>${p.character || '미선택'}</span><br>`;
         }
       });
       roomInfoBox.innerHTML = html;
@@ -279,6 +279,7 @@
       if (select) {
         select.onchange = function() {
           socket.emit('selectCharacter', select.value);
+          localStorage.setItem('character_now', select.value);
         };
       }
     });
