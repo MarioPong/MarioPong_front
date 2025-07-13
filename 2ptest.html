@@ -225,7 +225,9 @@
       errorDiv.innerText = '연결 오류: ' + err.message;
     });
     socket.on('waiting', (data) => {
-      statusDiv.innerText = '상대방을 기다리는 중...';
+      if (socket.id === data){
+        statusDiv.innerText = '준비완료! 상대방을 기다리는 중...';
+      }
     });
     socket.on('startGame', () => {
       showGame();
@@ -243,7 +245,6 @@
       showResultModal(data.winner, data.score);
     });
     socket.on('componentLeft', (id) => {
-      console.log("component left")
       if (socket.id !== id){
         socket.emit('leaveRoom', currentRoom);
         showLobby();
