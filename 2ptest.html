@@ -242,6 +242,12 @@
       gameActive = false;
       showResultModal(data.winner, data.score);
     });
+    socket.on('componentLeft', (id) => {
+      if (socket.id !== id){
+        socket.emit('leaveRoom', currentRoom);
+        showLobby();
+      }
+    });
 
     // 게임 화면
     function renderGame(state) {
