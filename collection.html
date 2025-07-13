@@ -16,7 +16,7 @@
       <div class="store-header">
         <span class="store-title">Collection</span>
         <div class="store-coin-box">
-          <img src="img/coin.png" alt="coin" class="store-coin" />
+          <img src="img/item/coin.png" alt="coin" class="store-coin" />
           <span class="store-coin-amount" id="coinAmount">0</span>
         </div>
       </div>
@@ -29,18 +29,18 @@
     function goBack() {
       window.location.href = 'main.html';
     }
-    // 임시 데이터 (나중에 서버에서 받아올 예정)
+    // 임시 데이터
     const user = {
       coins: 500,
-      owned: ['mario', 'yoshi', 'char5']
+      owned: ['mario', 'yoshi']
     };
     const characters = [
-      { key: 'mario', name: 'Mario', img: 'img/mario.png', price: 0 },
-      { key: 'yoshi', name: 'Yoshi', img: 'img/yoshi.png', price: 700 },
-      { key: 'donkikong', name: 'Donkikong', img: 'img/donkikong.png', price: 1000 },
-      { key: 'char4', name: '???', img: null, price: 1200 },
-      { key: 'char5', name: '???', img: null, price: 1500 },
-      { key: 'char6', name: '???', img: null, price: 2000 }
+      { key: 'mario', name: 'Mario', img: 'img/character/mario.png', price: 0 },
+      { key: 'yoshi', name: 'Yoshi', img: 'img/character/yoshi.png', price: 700 },
+      { key: 'koopa', name: 'Koopa', img: 'img/character/koopa.png', price: 1000 },
+      { key: 'kinopio', name: 'Kinopio', img: 'img/character/kinopio.png', price: 1200 },
+      { key: 'donkikong', name: 'Donkikong', img: 'img/character/donkikong.png', price: 1500 },
+      { key: 'peach', name: 'Princess Peach', img: 'img/character/princess_peach.png', price: 2000 }
     ];
     document.getElementById('coinAmount').textContent = user.coins;
     const list = document.getElementById('characterList');

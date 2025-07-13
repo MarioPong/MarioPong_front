@@ -16,7 +16,7 @@
       <div class="store-header">
         <span class="store-title">Store</span>
         <div class="store-coin-box">
-          <img src="img/coin.png" alt="coin" class="store-coin" />
+          <img src="img/item/coin.png" alt="coin" class="store-coin" />
           <span class="store-coin-amount" id="coinAmount">0</span>
         </div>
       </div>
@@ -25,26 +25,63 @@
       </div>
     </div>
   </div>
+  <div id="characterDetailModal" class="character-detail-modal" style="display:none;">
+    <div class="character-detail-content">
+      <button class="modal-close-btn" onclick="closeCharacterModal()">×</button>
+      <div class="character-detail-header">
+        <span class="character-detail-title">Store</span>
+        <div class="character-detail-coin-box">
+          <img src="img/item/coin.png" alt="coin" class="store-coin" />
+          <span class="store-coin-amount" id="modalCoinAmount">0</span>
+        </div>
+      </div>
+      <div class="character-detail-body">
+        <div class="character-detail-img-box">
+          <img id="modalCharacterImg" src="" alt="Character" class="character-img" />
+          <div id="modalOwnedLabel" class="owned-label" style="margin-top:16px;"></div>
+        </div>
+        <div class="character-detail-info">
+          <div class="character-detail-name" id="modalCharacterName">Name: </div>
+          <div class="character-detail-skill-label">Skill:</div>
+          <div class="character-detail-skill-box" id="modalSkill1"></div>
+          <div class="character-detail-skill-label">Skill:</div>
+          <div class="character-detail-skill-box" id="modalSkill2"></div>
+        </div>
+        <div class="character-detail-item">
+          <img id="modalItemImg" src="img/item/mushroom.png" alt="item" class="character-detail-item-img" />
+        </div>
+      </div>
+    </div>
+  </div>
   <script>
     function goBack() {
       window.location.href = 'main.html';
     }
-    // 임시 데이터 (나중에 서버에서 받아올 예정)
+    // 임시
     const user = {
       coins: 500,
       owned: ['mario']
     };
     const characters = [
-      { key: 'mario', name: 'Mario', img: 'img/mario.png', price: 0 },
-      { key: 'yoshi', name: 'Yoshi', img: 'img/yoshi.png', price: 700 },
-      { key: 'donkikong', name: 'Donkikong', img: 'img/donkikong.png', price: 1000 },
-      { key: 'kinopio', name: '???', img: null, price: 1200 },
-      { key: '???', name: '???', img: null, price: 1500 },
-      { key: 'peach', name: '???', img: null, price: 2000 }
+      { key: 'mario', name: 'Mario', img: 'img/character/mario.png', price: 0 },
+      { key: 'yoshi', name: 'Yoshi', img: 'img/character/yoshi.png', price: 700 },
+      { key: 'koopa', name: 'Koopa', img: 'img/character/koopa.png', price: 1000 },
+      { key: 'kinopio', name: 'Kinopio', img: 'img/character/kinopio.png', price: 1200 },
+      { key: 'donkikong', name: 'Donkikong', img: 'img/character/donkikong.png', price: 1500 },
+      { key: 'peach', name: 'Princess Peach', img: 'img/character/princess_peach.png', price: 2000 }
     ];
     document.getElementById('coinAmount').textContent = user.coins;
     const list = document.getElementById('characterList');
-    characters.forEach(char => {
+    // Item image mapping for each character
+    const itemImages = {
+      mario: 'img/item/mushroom.png',
+      yoshi: 'img/item/spiny_shell.png',
+      koopa: 'img/item/fire_flower.png',
+      kinopio: 'img/item/blooper.png',
+      donkikong: 'img/item/triple_green_shell.png',
+      peach: 'img/item/mini_mushroom.png'
+    };
+    characters.forEach((char, idx) => {
       const owned = user.owned.includes(char.key);
       const card = document.createElement('div');
       card.className = 'character-card';
@@ -53,10 +90,41 @@
           ${char.img ? `<img src="${char.img}" alt="${char.name}" class="character-img" />` : `<div class='character-placeholder'>?</div>`}
         </div>
         <div class="character-footer ${owned ? 'owned' : 'not-owned'}">
-          ${owned ? '<span class="owned-label">Owned</span>' : `<img src='img/coin.png' class='footer-coin'/> <span class='price'>${char.price}</span>`}
+          ${owned ? '<span class="owned-label">Owned</span>' : `<img src='img/item/coin.png' class='footer-coin'/> <span class='price'>${char.price}</span>`}
         </div>
       `;
+      card.addEventListener('click', (e) => {
+        card.classList.add('clicked');
+        setTimeout(() => {
+          card.classList.remove('clicked');
+          openCharacterModal(char, owned);
+        }, 180);
+      });
       list.appendChild(card);
+    });
+
+    // Modal logic
+    function openCharacterModal(char, owned) {
+      document.getElementById('modalCharacterImg').src = char.img || '';
+      document.getElementById('modalCharacterImg').alt = char.name;
+      document.getElementById('modalCharacterName').textContent = `Name: ${char.name}`;
+      document.getElementById('modalCoinAmount').textContent = user.coins;
+      document.getElementById('modalOwnedLabel').textContent = owned ? 'Owned' : '';
+      document.getElementById('modalOwnedLabel').style.display = owned ? 'block' : 'none';
+      // Placeholder for skills, can be filled from server later
+      document.getElementById('modalSkill1').textContent = '';
+      document.getElementById('modalSkill2').textContent = '';
+      // Use unique item image if available, else fallback
+      const itemImg = itemImages[char.key] || 'img/item/mushroom.png';
+      document.getElementById('modalItemImg').src = itemImg;
+      document.getElementById('characterDetailModal').style.display = 'flex';
+    }
+    function closeCharacterModal() {
+      document.getElementById('characterDetailModal').style.display = 'none';
+    }
+    // Close modal when clicking outside content
+    document.getElementById('characterDetailModal').addEventListener('click', function (e) {
+      if (e.target === this) closeCharacterModal();
     });
   </script>
 </body>

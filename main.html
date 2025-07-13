@@ -22,7 +22,7 @@
         <li><button onclick="userProfile()"><span class='menu-num-2'>2</span> Profile</button></li>
         <li><button onclick="move2store()"><span class='menu-num-3'>3</span> Store</button></li>
         <li><button onclick="collection()"><span class='menu-num-4'>4</span> Collections</button></li>
-        <li><button disabled><span class='menu-num-5'>5</span> Settings</button></li>
+        <li><button onclick="settings()"><span class='menu-num-5'>5</span> Settings</button></li>
       </ol>
     </nav>
     <button class="main-menu-logout" onclick="logOut(event)">logout</button>
@@ -39,6 +39,9 @@
     }
     function collection() {
       window.location.href = 'collection.html';
+    }
+    function settings() {
+      window.location.href = 'settings.html';
     }
     function logOut(event) {
       event.preventDefault();
