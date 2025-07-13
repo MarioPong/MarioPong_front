@@ -12,7 +12,7 @@ html {
   min-width: 100vw;
   height: 100vh;
   width: 100vw;
-  background: url('../img/background.png') no-repeat center center fixed;
+  background: url('../img/background_scaling_up.png') no-repeat center center fixed;
   background-size: cover;
   display: flex;
   align-items: center;
@@ -306,6 +306,7 @@ html {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 18px;
+  position: relative;
 }
 
 .character-detail-title {
@@ -319,6 +320,10 @@ html {
   display: flex;
   align-items: center;
   gap: 8px;
+  position: absolute;
+  right: 80px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .character-detail-body {
@@ -372,24 +377,26 @@ html {
   margin-bottom: 4px;
 }
 
-.character-detail-skill-box {
-  background: #e5e5e5;
-  border: 2px solid #d3c48d;
-  border-radius: 8px;
-  min-height: 80px;
-  margin-bottom: 10px;
+.character-detail-skill-text {
   font-size: 0.9rem;
-  display: flex;
-  align-items: flex-start;
-  padding: 16px;
+  margin-bottom: 16px;
   font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
   color: #2f2421;
   line-height: 1.4;
   text-align: left;
   white-space: normal;
   word-wrap: break-word;
-  overflow-y: auto;
-  max-height: 120px;
+}
+
+.character-detail-description {
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+  font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+  color: #2f2421;
+  line-height: 1.4;
+  text-align: left;
+  white-space: normal;
+  word-wrap: break-word;
 }
 
 .character-detail-item {
