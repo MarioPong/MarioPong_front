@@ -145,7 +145,12 @@
     };
     exitGameBtn.onclick = () => {
       socket.emit('leaveRoom', currentRoom);
+      readyBtn.disabled = true;
+      leaveBtn.disabled = true;
+      joined = false;
+      currentRoom = null;
       showLobby();
+      roomInfoBox.innerHTML = '';
     };
     getReadyBtn.onclick = () => {
       socket.emit('ready');
@@ -167,7 +172,7 @@
       context.clearRect(0, 0, canvas.width, canvas.height);
       hideResultModal();
       hideRoomModal();
-      //roomInfoBox.innerHTML = '';
+      socket.emit('requestRoomInfo');
       roomInfoBox.style.display = 'block';
     }
     function showGame() {
