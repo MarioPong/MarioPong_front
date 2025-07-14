@@ -413,6 +413,47 @@ html {
   filter: drop-shadow(0 4px 12px #0005);
 }
 
+.character-detail-footer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 24px;
+  padding: 16px 0;
+  border-radius: 0 0 16px 16px;
+}
+
+#buyButton.mode-btn,
+#buyButton {
+  font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+  font-size: 1.3rem;
+  background: #302321;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 20px 40px;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 #bbb, 3px 3px 0 #000;
+  transition: all 0.2s ease;
+  min-width: 250px;
+  text-align: center;
+  display: block;
+  margin: 0 auto;
+}
+
+#buyButton.mode-btn:hover,
+#buyButton:hover {
+  background: #f1cf53;
+  color: #000;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+#buyButton.mode-btn:active,
+#buyButton:active {
+  transform: scale(0.98);
+}
+
 @media (max-width: 900px) {
   .character-detail-content {
     min-width: 90vw;
@@ -449,4 +490,5 @@ html {
   100% {
     transform: scale(1);
   }
+
 }

@@ -126,7 +126,6 @@ html {
   background: none !important;
   color: #fff;
   border: none !important;
-  border-radius: 0 !important;
   padding: 8px 24px;
   cursor: pointer;
   text-shadow: 1px 1px 0 #000;
@@ -134,7 +133,9 @@ html {
 }
 
 .main-menu-logout:hover {
-  background: none !important;
+  /*색 변경하기!*/
+  background: #e04d45;
+  border-radius: 20;
   color: #fff;
   transform: scale(1.18);
 }
