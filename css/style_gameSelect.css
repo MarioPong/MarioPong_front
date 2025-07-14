@@ -1,5 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
+@font-face {
+  font-family: 'DNFBitBitv2';
+  font-style: normal;
+  font-weight: 400;
+  src: url('//cdn.df.nexon.com/img/common/font/DNFBitBitv2.otf')format('opentype')
+}
+
 body,
 html {
   height: 100%;
@@ -125,62 +132,107 @@ html {
   border: 4px solid #7ed6f7;
   border-radius: 18px;
   box-shadow: 0 4px 24px 0 #0004;
-  min-width: 400px;
-  max-width: 420px;
-  padding: 40px 32px 32px 32px;
+  min-width: 450px;
+  max-width: 500px;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
   position: relative;
+  overflow: hidden;
+}
+
+.multi-modal-header {
+  background: #e04d45;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  border-bottom: 3px solid #7ed6f7;
+}
+
+.multi-modal-back {
+  font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 5px;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.multi-modal-back:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
 }
 
 .multi-modal-title {
-  font-size: 2.2rem;
-  color: #2f2421;
+  font-size: 1.8rem;
+  color: #fff;
   text-align: center;
-  margin-bottom: 24px;
   font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
-  text-shadow: 3px 3px 0 #fff, 4px 4px 0 #000;
+  text-shadow: 2px 2px 0 #000;
+  flex-grow: 1;
 }
 
-.multi-modal-room {
+.multi-modal-content {
+  padding: 30px;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.room-section {
+  background: #fff;
+  border: 2px solid #7ed6f7;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.room-input-group {
+  display: flex;
+  flex-direction: column;
   gap: 10px;
-  margin-bottom: 24px;
 }
 
 .room-label {
   font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: #2f2421;
-  margin-right: 8px;
+  font-weight: bold;
+}
+
+.room-input-container {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
 .room-input {
   font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
-  font-size: 1.2rem;
-  padding: 12px 24px;
+  font-size: 1rem;
+  padding: 12px 16px;
   border: 2px solid #7ed6f7;
   border-radius: 8px;
   background: #fff;
   color: #2f2421;
   outline: none;
-  width: 220px;
-  margin-right: 12px;
+  flex-grow: 1;
   box-sizing: border-box;
 }
 
 .room-make-btn {
   font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
-  font-size: 1rem;
+  font-size: 0.8rem;
   background: #302321;
   color: #fff;
   border: none;
   border-radius: 6px;
-  padding: 8px 18px;
+  padding: 12px 16px;
   cursor: pointer;
   transition: background 0.2s, transform 0.1s;
+  white-space: nowrap;
 }
 
 .room-make-btn:hover {
@@ -189,51 +241,331 @@ html {
   transform: scale(1.05);
 }
 
-.multi-modal-btns {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  width: 100%;
-  margin-bottom: 10px;
+.player-section {
+  background: #fff;
+  border: 2px solid #7ed6f7;
+  border-radius: 10px;
+  padding: 20px;
 }
 
-.multi-btn {
+.player-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.player-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 10px;
+  border-radius: 8px;
+  background: #f8f8f8;
+}
+
+.player-avatar {
+  width: 40px;
+  height: 40px;
+  background: #e04d45;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+  font-size: 0.8rem;
+  font-weight: bold;
+  border: 2px solid #7ed6f7;
+}
+
+.player-info {
+  flex-grow: 1;
+}
+
+.player-name {
+  font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+  font-size: 0.9rem;
+  color: #2f2421;
+  margin-bottom: 5px;
+}
+
+.player-status {
+  font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+  font-size: 0.7rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.player-status.ready {
+  background: #4CAF50;
+  color: #fff;
+}
+
+.player-status.waiting {
+  background: #FF9800;
+  color: #fff;
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.action-btn {
+  font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  padding: 15px 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.action-btn.join {
+  background: #4CAF50;
+  color: #fff;
+}
+
+.action-btn.join:hover {
+  background: #45a049;
+  transform: scale(1.02);
+}
+
+.action-btn.ready {
+  background: #2196F3;
+  color: #fff;
+}
+
+.action-btn.ready:hover {
+  background: #1976D2;
+  transform: scale(1.02);
+}
+
+.action-btn.leave {
+  background: #f44336;
+  color: #fff;
+}
+
+.action-btn.leave:hover {
+  background: #d32f2f;
+  transform: scale(1.02);
+}
+
+.ready-modal {
+  background: #ffe7a3;
+  border-radius: 24px;
+  border: none;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  min-width: 900px;
+  max-width: 1000px;
+  padding: 0 0 30px 0;
+  position: relative;
+  font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.ready-header {
+  font-size: 2.8rem;
+  color: #2f2421;
+  text-shadow: 3px 3px 0 #fff, 4px 4px 0 #000;
+  font-weight: bold;
+  padding: 36px 0 10px 48px;
+  letter-spacing: 2px;
+}
+
+.ready-room-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin: 0 0 18px 0;
+  padding: 0 48px;
+}
+
+.ready-room-label {
+  font-size: 1.3rem;
+  color: #2f2421;
+  margin-right: 8px;
+}
+
+.ready-room-input {
+  font-family: 'Press Start 2P', 'DNFBitBitv2', 'Courier New', Courier, monospace;
+  font-size: 1.1rem;
+  padding: 10px 18px;
+  border: 2px solid #b6a16b;
+  border-radius: 8px;
+  background: #fff;
+  color: #2f2421;
+  outline: none;
+  min-width: 340px;
+  box-sizing: border-box;
+}
+
+.ready-room-btn {
   font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
   font-size: 1.1rem;
-  background: #302321;
+  background: #2f2421;
   color: #fff;
   border: none;
   border-radius: 8px;
-  padding: 14px 0;
+  padding: 12px 28px;
   cursor: pointer;
-  width: 100%;
-  margin: 0 auto;
+  margin-left: 10px;
+  transition: background 0.2s, transform 0.1s;
+  position: relative;
+}
+
+.ready-room-btn .join-text {
+  color: #fff;
+}
+
+.ready-room-btn:hover {
+  background: #f1cf53;
+  color: #2f2421;
+}
+
+.ready-main-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 32px;
+  padding: 0 48px;
+}
+
+.ready-player-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 240px;
+  flex: 1 1 0;
+}
+
+.ready-player-label {
+  font-size: 1.2rem;
+  color: #2f2421;
+  margin-bottom: 8px;
+}
+
+.ready-check {
+  color: #1ebc2a;
+  font-size: 1.3em;
+  font-weight: bold;
+}
+
+.ready-x {
+  color: #e04d45;
+  font-size: 1.3em;
+  font-weight: bold;
+}
+
+.ready-player-img-box {
+  border: 5px solid #b6a16b;
+  border-radius: 12px;
+  background: #fff;
+  width: 180px;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.ready-player-img {
+  width: 150px;
+  height: 150px;
+  object-fit: contain;
+}
+
+.ready-select-btn {
+  font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+  font-size: 1.1rem;
+  background: #2f2421;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  margin-top: 8px;
+  cursor: pointer;
   transition: background 0.2s, transform 0.1s;
 }
 
-.multi-btn:hover {
+.ready-select-btn:hover {
   background: #f1cf53;
-  color: #000;
-  transform: scale(1.05);
+  color: #2f2421;
 }
 
-.multi-modal-close {
+.ready-center-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 220px;
+  flex: 1 1 0;
+  gap: 18px;
+  margin-top: 30px;
+}
+
+.ready-room-name {
+  font-size: 1.1rem;
+  color: #2f2421;
+  margin-bottom: 18px;
+  font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+}
+
+.ready-action-btn {
+  font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+  font-size: 1.2rem;
+  background: #2f2421;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 48px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  width: 180px;
+}
+
+.ready-action-btn:hover {
+  background: #f1cf53;
+  color: #2f2421;
+}
+
+.ready-action-btn.leave {
+  background: #e04d45;
+  color: #fff;
+}
+
+.ready-action-btn.leave:hover {
+  background: #f1cf53;
+  color: #e04d45;
+}
+
+.ready-close-btn {
   position: absolute;
-  top: 12px;
-  right: 18px;
-  font-size: 2rem;
+  top: 18px;
+  right: 28px;
+  font-size: 2.2rem;
   background: none;
   border: none;
   color: #e04d45;
   cursor: pointer;
   font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
   transition: color 0.2s, transform 0.1s;
+  z-index: 10;
 }
 
-.multi-modal-close:hover {
-  color: #f1cf53;
-  transform: scale(1.2);
+.ready-close-btn:hover {
+  color: #2f2421;
+  transform: scale(1.15);
 }
+
 
 @media (max-width: 700px) {
   .game-select-card {
@@ -283,5 +615,32 @@ html {
     width: 90vw;
     min-width: 0;
     margin-right: 6px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .ready-modal {
+    min-width: 98vw;
+    max-width: 100vw;
+    padding: 0 0 20px 0;
+  }
+
+  .ready-main-row,
+  .ready-room-row {
+    padding: 0 10px;
+  }
+}
+
+@media (max-width: 900px) {
+  .ready-main-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .ready-player-col,
+  .ready-center-col {
+    min-width: 0;
+    width: 100%;
   }
 }

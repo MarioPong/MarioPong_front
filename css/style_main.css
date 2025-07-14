@@ -1,5 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
+@font-face {
+  font-family: 'DNFBitBitv2';
+  font-style: normal;
+  font-weight: 400;
+  src: url('//cdn.df.nexon.com/img/common/font/DNFBitBitv2.otf')format('opentype')
+}
+
+input,
+textarea {
+  font-family: 'Press Start 2P', 'DNFBitBitv2', 'Courier New', Courier, monospace;
+}
+
 body,
 html {
   height: 100%;
@@ -25,14 +37,12 @@ html {
 }
 
 #userName {
-  font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
-  font-size: 3rem;
+  font-family: 'Press Start 2P', 'DNFBitBitv2', 'Courier New', Courier, monospace;
+  font-size: 2rem;
   color: #000;
   margin-bottom: 15px;
   display: inline-block;
-  font-weight: bold;
 }
-
 
 
 .main-menu-title-img {

@@ -1,5 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
+@font-face {
+  font-family: 'DNFBitBitv2';
+  font-style: normal;
+  font-weight: 400;
+  src: url('//cdn.df.nexon.com/img/common/font/DNFBitBitv2.otf')format('opentype')
+}
+
 body,
 html {
   height: 100%;
@@ -268,4 +275,9 @@ html {
     font-size: 1rem;
     padding: 12px 25px;
   }
+}
+
+input,
+textarea {
+  font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
 }

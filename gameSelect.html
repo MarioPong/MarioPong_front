@@ -7,13 +7,14 @@
   <title>Game Selection</title>
   <link rel="stylesheet" href="css/style_gameSelect.css" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link href="//cdn.df.nexon.com/img/common/font/DNFBitBitv2.otf" rel="stylesheet">
 </head>
 
 <body>
   <div class="game-select-bg">
     <div class="game-select-card">
       <div class="game-select-header">
-        <button class="back-btn" onclick="goBack()">← Back</button>
+        <button class="back-btn" onclick="goBack()">Back</button>
         <span class="game-select-title">Select Game Mode</span>
       </div>
       <div class="game-mode-selection">
@@ -24,19 +25,35 @@
       </div>
     </div>
     <div class="multi-modal-bg" id="multiModal" style="display:none;">
-      <div class="multi-modal-card">
-        <div class="multi-modal-title">Ready</div>
-        <div class="multi-modal-room">
-          <label for="room-number" class="room-label">Room number</label>
-          <input id="room-number" class="room-input" type="text" placeholder="Enter" />
-          <button class="room-make-btn" onclick="makeRoom()">make</button>
+      <div class="multi-modal-card ready-modal">
+        <div class="ready-header">Ready</div>
+        <div class="ready-room-row">
+          <span class="ready-room-label">Enter Room</span>
+          <input id="room-number" class="ready-room-input" type="text" placeholder="Room number" />
+          <button class="ready-room-btn" onclick="makeOrJoinRoom()">Make/<span class="join-text">Join</span></button>
         </div>
-        <div class="multi-modal-btns">
-          <button class="multi-btn" onclick="participateRoom()">Participate</button>
-          <button class="multi-btn" onclick="leaveRoom()">Leave Room</button>
-          <button class="multi-btn" onclick="readyRoom()">Ready</button>
+        <div class="ready-main-row">
+          <div class="ready-player-col">
+            <div class="ready-player-label">P1: YOLO(<span class="ready-check">✔️</span>)</div>
+            <div class="ready-player-img-box">
+              <img src="img/character/yoshi.png" class="ready-player-img" alt="Yoshi" />
+            </div>
+            <button class="ready-select-btn">Select Chatacter</button>
+          </div>
+          <div class="ready-center-col">
+            <div class="ready-room-name">(Rome name)</div>
+            <button class="ready-action-btn">Ready</button>
+            <button class="ready-action-btn leave">Leave</button>
+          </div>
+          <div class="ready-player-col">
+            <div class="ready-player-label">P2: Shim(<span class="ready-x">❌</span>)</div>
+            <div class="ready-player-img-box">
+              <img src="img/character/donkikong.png" class="ready-player-img" alt="Donkey Kong" />
+            </div>
+            <button class="ready-select-btn">Select Chatacter</button>
+          </div>
         </div>
-        <button class="multi-modal-close" onclick="closeMultiModal()">×</button>
+        <button class="ready-close-btn" onclick="closeMultiModal()">×</button>
       </div>
     </div>
   </div>
@@ -69,7 +86,5 @@
     }
   </script>
 </body>
-
-</html>
 
 </html>

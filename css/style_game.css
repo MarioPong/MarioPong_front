@@ -46,3 +46,14 @@ html {
     padding: 10px;
   }
 }
+
+@font-face {
+  font-family: 'NeoDunggeunmoPro-Korean';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/NeoDunggeunmoPro-Regular.woff2') format('woff2');
+  unicode-range: U+AC00-D7A3, U+1100-11FF, U+3130-318F;
+}
+
+input,
+textarea {
+  font-family: 'Press Start 2P', 'NeoDunggeunmoPro-Korean', 'Courier New', Courier, monospace;
+}

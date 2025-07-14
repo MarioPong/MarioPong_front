@@ -1,5 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
+@font-face {
+  font-family: 'DNFBitBitv2';
+  font-style: normal;
+  font-weight: 400;
+  src: url('https://cdn.df.nexon.com/img/common/font/DNFBitBitv2.woff2') format('woff2'),
+    url('https://cdn.df.nexon.com/img/common/font/DNFBitBitv2.otf') format('opentype');
+}
+
+.form-input {
+  font-size: 0.8rem;
+  padding: 10px 12px;
+  font-family: 'Press Start 2P', 'DNFBitBitv2', 'Courier New', Courier, monospace;
+}
+
 body,
 html {
   height: 100%;
@@ -72,7 +86,7 @@ html {
 }
 
 .form-input {
-  font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+  font-family: 'Press Start 2P', 'DNFBitBitv2', 'Courier New', Courier, monospace;
   font-size: 0.9rem;
   padding: 12px 16px;
   border: 3px solid #7ed6f7;
@@ -186,6 +200,7 @@ html {
   }
 
   .form-input {
+    font-family: 'Press Start 2P', 'DNFBitBitv2', 'Courier New', Courier, monospace;
     font-size: 0.8rem;
     padding: 10px 12px;
   }
