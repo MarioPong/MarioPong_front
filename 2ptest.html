@@ -50,6 +50,12 @@
   <div id="gameScreen">
     <canvas id="pongCanvas"></canvas>
     <button id="exitGameBtn" style="position:absolute;top:24px;right:40px;z-index:10;">게임 나가기</button>
+    <div id="skillBarContainer" style="position:absolute;top:16px;left:50%;transform:translateX(-50%);width:240px;height:24px;z-index:20;">
+      <div id="skillBarBg" style="width:100%;height:100%;background:#444;border-radius:12px;">
+        <div id="skillBar" style="width:0%;height:100%;background:#3fcf3f;border-radius:12px;transition:width 0.2s;"></div>
+      </div>
+      <div id="skillLabel" style="position:absolute;top:0;left:0;width:100%;height:100%;text-align:center;line-height:24px;color:#fff;font-size:1.1em;font-weight:bold;">스킬 쿨타임</div>
+    </div>
   </div>
 
   <!-- 결과 모달 -->
@@ -61,16 +67,6 @@
     </div>
   </div>
 
-  <!-- 방 생성 창 -->
-  <div id="roomModal">
-    <div id="roomBox">
-      <h2 id="roomTitle"></h2>
-      <p id="roomName"></p>
-      <div id="isReady"></div>
-      <button id="getReadyBtn">준비완료</button>
-      <button id="returnBtn">방 나가기</button>
-    </div>
-
   <script>
     const socket = io('https://mariopong-back.onrender.com/pong');
     let joined = false;
@@ -80,6 +76,10 @@
     let playerIndex = 2;
     let userName =  localStorage.getItem('userName');
     let characters =  JSON.parse(localStorage.getItem('characters') || '[]');
+    let skillCooldown = 10; // 캐릭터별 쿨타임(초)
+    let lastSkillTime = 0;
+    let skillReady = false;
+
 
     // 화면 요소
     const lobbyScreen = document.getElementById('lobbyScreen');
@@ -95,12 +95,6 @@
     const resultTitle = document.getElementById('resultTitle');
     const resultScore = document.getElementById('resultScore');
     const toLobbyBtn = document.getElementById('toLobbyBtn');
-    const roomModal = document.getElementById('roomModal');
-    const roomTitle = document.getElementById('roomTitle');
-    const roomName = document.getElementById('roomName');
-    const isReadyDiv = document.getElementById('isReady');
-    const getReadyBtn = document.getElementById('getReadyBtn');
-    const returnBtn = document.getElementById('returnBtn');
     const roomInfoBox = document.getElementById('roomInfoBox');
 
     function resizeCanvas() {
@@ -109,6 +103,17 @@
     }
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
+
+    function updateSkillBar() {
+      const now = Date.now();
+      const elapsed = (now - lastSkillTime) / 1000;
+      let percent = Math.min(1, elapsed / skillCooldown);
+      document.getElementById('skillBar').style.width = (percent * 100) + '%';
+      skillReady = percent >= 1;
+      document.getElementById('skillLabel').innerText = skillReady ? '스킬 사용 가능! (Space)' : `쿨타임: ${Math.ceil(skillCooldown - elapsed)}초`;
+    }
+    setInterval(updateSkillBar, 100); // 0.1초마다 갱신
+
 
     function joinRoom(roomName) {
       if (!roomName) {
@@ -152,15 +157,15 @@
       showLobby();
       roomInfoBox.innerHTML = '';
     };
-    getReadyBtn.onclick = () => {
-      socket.emit('ready');
-      isReadyDiv.innerText = '준비완료! 상대방을 기다리는 중...';
-      getReadyBtn.disabled = true;
-    };
-    returnBtn.onclick = () => {
-      socket.emit('leaveRoom', currentRoom);
-      showLobby();
-    };
+
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' && skillReady && gameActive) {
+        socket.emit('useSkill'); // 서버에 스킬 사용 요청
+        lastSkillTime = Date.now();
+        skillReady = false;
+        updateSkillBar();
+      }
+    });
 
     function showLobby() {
       gameScreen.style.display = 'none';
@@ -192,24 +197,6 @@
       resultModal.style.display = 'none';
     }
     toLobbyBtn.onclick = () => {
-      showLobby();
-    };
-
-    // 방 모달
-    function showRoomModal(roomn, players) {
-      roomTitle.innerText = `방 이름 : ${roomn}`;
-      if (players.length()>1) {
-        roomName.innerText = `참가자: ${players[0]}, ${players[1]}`;
-      }
-      else {
-        roomName.innerText = `참가자: ${score[0]}`;
-      }
-      roomModal.style.display = 'flex';
-    }
-    function hideRoomModal() {
-      roomModal.style.display = 'none';
-    }
-    returnBtn.onclick = () => {
       showLobby();
     };
 
