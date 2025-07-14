@@ -421,6 +421,14 @@
       context.fillStyle = 'white';
       context.fill();
 
+      for (const ball of state.fakeBalls){
+        context.globalAlpha = 0.5;
+        context.beginPath();
+        context.arc(ball.x, ball.y, Math.min(cw, ch) * 0.02, 0, 2 * Math.PI, false);
+        context.fillStyle = 'white';
+        context.fill();
+      }
+
       context.font = `${Math.floor(ch * 0.08)}px Courier New`;
       context.fillText(state.score ? state.score[0] : 0, cw * 0.25, ch * 0.1);
       context.fillText(state.score ? state.score[1] : 0, cw * 0.75, ch * 0.1);
