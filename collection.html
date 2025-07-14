@@ -56,8 +56,116 @@
         </div>
       `;
       list.appendChild(card);
+      // Add click event to open modal with character info
+      card.addEventListener('click', () => {
+        card.classList.add('clicked');
+        setTimeout(() => {
+          card.classList.remove('clicked');
+          openCharacterModal(char);
+        }, 180);
+      });
+    });
+
+    // Modal logic (copied/adapted from store.html)
+    function openCharacterModal(char) {
+      document.getElementById('modalCharacterImg').src = char.img || '';
+      document.getElementById('modalCharacterImg').alt = char.name;
+      document.getElementById('modalCharacterName').textContent = `Name: ${char.name}`;
+      document.getElementById('modalCoinAmount').textContent = user.coins;
+      document.getElementById('modalOwnedLabel').textContent = 'Owned';
+      document.getElementById('modalOwnedLabel').style.display = 'block';
+
+      // Character descriptions
+      const characterDescriptions = {
+        mario: 'Mario is a cheerful and heroic plumber known for his bravery, jumping skills, and versatility in sports and adventures across the Mushroom Kingdom.',
+        donkikong: 'Donkey Kong is a powerful jungle king with a love for bananas and a signature red necktie, known for his immense strength and barrel-throwing.',
+        yoshi: 'Yoshi is a kind, green dinosaur from Yoshi\'s Island who uses his tongue to eat enemies and turn them into eggs.',
+        koopa: 'Koopa is the fire-breathing King of the Koopas and Mario\'s main rival, constantly threatening the Mushroom Kingdom with his powerful minions.',
+        kinopio: 'Toad is a cheerful and loyal servant of Princess Peach who supports Mario and Luigi, often risking himself to help protect the kingdom.',
+        peach: 'Princess Peach is the kind-hearted ruler of the Mushroom Kingdom who loves baking, sports, and working toward harmony for all.'
+      };
+      const description = characterDescriptions[char.key] || '';
+      const skillText = document.getElementById('modalSkillText');
+      const descriptionElement = document.getElementById('modalDescription');
+      // Skill names and descriptions for each character
+      const skillNames = {
+        mario: 'Red Mushroom',
+        yoshi: 'Super Shell',
+        kinopio: 'Squid',
+        donkikong: 'Triple Shell',
+        koopa: 'Fire Flower',
+        peach: 'Mini Mushroom'
+      };
+      const skillDescriptions = {
+        mario: 'His racket becomes larger.',
+        yoshi: 'Opponent\'s movement slows down next turn (shocked).',
+        kinopio: 'Temporarily blocks the opponent\'s vision with ink.',
+        donkikong: 'Throws 2 fake balls along with the real one.',
+        koopa: 'Throws a fast fireball.',
+        peach: 'Shrinks the opponent\'s racket size.'
+      };
+      const skillName = skillNames[char.key] || 'Unknown Skill';
+      const skillDescription = skillDescriptions[char.key] || 'No skill available';
+      document.getElementById('modalSkillLabel').textContent = `Skill: ${skillName}`;
+      skillText.textContent = skillDescription;
+      descriptionElement.textContent = description;
+      // Item image mapping for each character
+      const itemImages = {
+        mario: 'img/item/mushroom.png',
+        yoshi: 'img/item/spiny_shell.png',
+        koopa: 'img/item/fire_flower.png',
+        kinopio: 'img/item/blooper.png',
+        donkikong: 'img/item/triple_green_shell.png',
+        peach: 'img/item/mini_mushroom.png'
+      };
+      const itemImg = itemImages[char.key] || 'img/item/mushroom.png';
+      document.getElementById('modalItemImg').src = itemImg;
+      const modal = document.getElementById('characterDetailModal');
+      modal.style.display = 'flex';
+    }
+    function closeCharacterModal() {
+      document.getElementById('characterDetailModal').style.display = 'none';
+    }
+    // Close modal when clicking outside content
+    // (add after DOM loaded)
+    window.addEventListener('DOMContentLoaded', function () {
+      const modal = document.getElementById('characterDetailModal');
+      if (modal) {
+        modal.addEventListener('click', function (e) {
+          if (e.target === this) closeCharacterModal();
+        });
+      }
     });
   </script>
+  <!-- Character Detail Modal (copied/adapted from store.html) -->
+  <div id="characterDetailModal" class="character-detail-modal" style="display:none;">
+    <div class="character-detail-content">
+      <button class="modal-close-btn" onclick="closeCharacterModal()">×</button>
+      <div class="character-detail-header">
+        <span class="character-detail-title">Collection</span>
+        <div class="character-detail-coin-box">
+          <img src="img/item/coin.png" alt="coin" class="store-coin" />
+          <span class="store-coin-amount" id="modalCoinAmount">0</span>
+        </div>
+      </div>
+      <div class="character-detail-body">
+        <div class="character-detail-img-box">
+          <img id="modalCharacterImg" src="" alt="Character" class="character-img" />
+          <div id="modalOwnedLabel" class="owned-label" style="margin-top:16px;"></div>
+        </div>
+        <div class="character-detail-info">
+          <div class="character-detail-name" id="modalCharacterName">Name: </div>
+          <div class="character-detail-skill-label" id="modalSkillLabel">Skill:</div>
+          <div class="character-detail-skill-text" id="modalSkillText"></div>
+          <div class="character-detail-skill-label">Description:</div>
+          <div class="character-detail-description" id="modalDescription"></div>
+        </div>
+        <div class="character-detail-item">
+          <img id="modalItemImg" src="img/item/mushroom.png" alt="item" class="character-detail-item-img" />
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 
 </html>

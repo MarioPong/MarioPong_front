@@ -28,32 +28,32 @@
       <div class="multi-modal-card ready-modal">
         <div class="ready-header">Ready</div>
         <div class="ready-room-row">
-          <span class="ready-room-label">Enter Room</span>
-          <input id="room-number" class="ready-room-input" type="text" placeholder="Room number" />
-          <button class="ready-room-btn" onclick="makeOrJoinRoom()">Make/<span class="join-text">Join</span></button>
+          <span class="ready-room-label">Enter:</span>
+          <input id="room-number" class="ready-room-input" type="text" placeholder="Enter Room" />
+          <button class="ready-room-btn" onclick="makeOrJoinRoom()">Make/Join</button>
         </div>
         <div class="ready-main-row">
           <div class="ready-player-col">
-            <div class="ready-player-label">P1: YOLO(<span class="ready-check">✔️</span>)</div>
+            <div class="ready-player-label">P1: YOLO(<span class="ready-check" id="player1Status">❌</span>)</div>
             <div class="ready-player-img-box">
-              <img src="img/character/yoshi.png" class="ready-player-img" alt="Yoshi" />
+              <img src="img/character/mario.png" class="ready-player-img" alt="Mario" />
             </div>
-            <button class="ready-select-btn">Select Chatacter</button>
+            <div class="custom-character-dropdown" data-player="1"></div>
           </div>
           <div class="ready-center-col">
-            <div class="ready-room-name">(Rome name)</div>
-            <button class="ready-action-btn">Ready</button>
-            <button class="ready-action-btn leave">Leave</button>
+            <div class="ready-room-name">(Room name)</div>
+            <button class="ready-action-btn" id="readyBtn">Ready</button>
+            <button class="ready-action-btn leave" id="leaveBtn">Leave</button>
           </div>
           <div class="ready-player-col">
-            <div class="ready-player-label">P2: Shim(<span class="ready-x">❌</span>)</div>
+            <div class="ready-player-label">P2: Shim(<span class="ready-x" id="player2Status">❌</span>)</div>
             <div class="ready-player-img-box">
-              <img src="img/character/donkikong.png" class="ready-player-img" alt="Donkey Kong" />
+              <img src="img/character/mario.png" class="ready-player-img" alt="Mario" />
             </div>
-            <button class="ready-select-btn">Select Chatacter</button>
+            <div class="custom-character-dropdown" data-player="2"></div>
           </div>
         </div>
-        <button class="ready-close-btn" onclick="closeMultiModal()">×</button>
+        <button class="ready-close-btn" id="readyCloseBtn" onclick="closeMultiModal()">×</button>
       </div>
     </div>
   </div>
@@ -65,6 +65,7 @@
     }
     function showMultiModal() {
       document.getElementById('multiModal').style.display = 'flex';
+      setTimeout(initCustomDropdowns, 0); // Ensure DOM is ready
     }
     function closeMultiModal() {
       document.getElementById('multiModal').style.display = 'none';
@@ -83,6 +84,94 @@
     }
     function readyRoom() {
       alert('나중에..');
+    }
+    // Custom Character Dropdown
+    const characters = [
+      { name: 'Mario', img: 'img/character/mario.png' },
+      { name: 'Yoshi', img: 'img/character/yoshi.png' },
+      { name: 'Donkey Kong', img: 'img/character/donkikong.png' },
+      { name: 'Kinopio', img: 'img/character/kinopio.png' },
+      { name: 'Koopa', img: 'img/character/koopa.png' },
+      { name: 'Princess Peach', img: 'img/character/princess_peach.png' }
+    ];
+    function createDropdown(selectedIdx, playerNum) {
+      const container = document.createElement('div');
+      container.className = 'dropdown-container';
+
+      // Dropdown button
+      const btn = document.createElement('button');
+      btn.className = 'dropdown-btn';
+      btn.type = 'button';
+      btn.innerHTML = `<img src="${characters[selectedIdx].img}" class="dropdown-btn-img" alt="${characters[selectedIdx].name}" /><span class="dropdown-btn-name">${characters[selectedIdx].name}</span><span class="dropdown-arrow">▼</span>`;
+
+      // Dropdown list
+      const list = document.createElement('div');
+      list.className = 'dropdown-list';
+      characters.forEach((c, idx) => {
+        const item = document.createElement('div');
+        item.className = 'dropdown-item';
+        item.innerHTML = `<img src="${c.img}" class="dropdown-item-img" alt="${c.name}" /><span class="dropdown-item-name">${c.name}</span>`;
+        item.onclick = () => {
+          btn.innerHTML = `<img src="${c.img}" class="dropdown-btn-img" alt="${c.name}" /><span class="dropdown-btn-name">${c.name}</span><span class="dropdown-arrow">▼</span>`;
+          list.style.display = 'none';
+          // Update player image
+          const col = btn.closest('.ready-player-col');
+          if (col) {
+            const img = col.querySelector('.ready-player-img');
+            if (img) img.src = c.img;
+          }
+        };
+        list.appendChild(item);
+      });
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        list.style.display = list.style.display === 'block' ? 'none' : 'block';
+      };
+      container.appendChild(btn);
+      container.appendChild(list);
+      // Close dropdown on outside click
+      document.addEventListener('click', function closeDropdown(e) {
+        if (!container.contains(e.target)) {
+          list.style.display = 'none';
+        }
+      });
+      return container;
+    }
+    function initCustomDropdowns() {
+      // For each custom-character-dropdown, insert dropdown (default Mario for both)
+      document.querySelectorAll('.custom-character-dropdown').forEach((el) => {
+        el.innerHTML = '';
+        el.appendChild(createDropdown(0, el.dataset.player)); // 0 = Mario
+      });
+    }
+    // Add Ready/Leave button logic for player1 and player2 status emoji swap
+    document.addEventListener('DOMContentLoaded', function () {
+      const readyBtn = document.getElementById('readyBtn');
+      const leaveBtn = document.getElementById('leaveBtn');
+      const player1Status = document.getElementById('player1Status');
+      const player2Status = document.getElementById('player2Status');
+      if (readyBtn && leaveBtn && player1Status && player2Status) {
+        readyBtn.addEventListener('click', function () {
+          player1Status.textContent = '✔️';
+          player2Status.textContent = '✔️';
+        });
+        leaveBtn.addEventListener('click', function () {
+          player1Status.textContent = '❌';
+          player2Status.textContent = '❌';
+        });
+      }
+      // (Room name live update logic removed as per user request)
+    });
+    function makeOrJoinRoom() {
+      const roomInput = document.getElementById('room-number');
+      const roomNameDiv = document.querySelector('.ready-room-name');
+      const value = roomInput.value.trim() ? roomInput.value : '(Room name)';
+      roomNameDiv.textContent = value;
+
+      // 애니메이션 효과
+      roomNameDiv.classList.remove('animate'); // 연속 클릭 시 초기화
+      void roomNameDiv.offsetWidth; // reflow로 강제 재적용
+      roomNameDiv.classList.add('animate');
     }
   </script>
 </body>
