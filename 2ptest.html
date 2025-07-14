@@ -65,6 +65,12 @@
     </div>
   </div>
 
+  <div id="blindOverlay"
+      style="display:none; position:absolute; top:0; left:0; width:100vw; height:100vh; z-index:1000; background:rgba(0,0,0,0.7); justify-content:center; align-items:center;">
+    <img src="./img/item/blooper.png" style="max-width:80vw; max-height:80vh; opacity:0.95;">
+  </div>
+
+
   <script>
     // ====== 설정 ======
     const socket = io('https://mariopong-back.onrender.com/pong');
@@ -95,6 +101,7 @@
     const resultScore = document.getElementById('resultScore');
     const toLobbyBtn = document.getElementById('toLobbyBtn');
     const roomInfoBox = document.getElementById('roomInfoBox');
+    const blindOverlay = document.getElementById('blindOverlay');
 
     // ====== 유틸 ======
     function resizeCanvas() {
@@ -279,12 +286,15 @@
           myCharacter = select.value;
           socket.emit('selectCharacter', select.value);
           localStorage.setItem('character_now', select.value);
-          // 캐릭터별 쿨타임 예시 (여기서 쿨타임 변경)
-          if (myCharacter === 'Mario') skillCooldown = 10;
-          else if (myCharacter === 'Sonic') skillCooldown = 8;
-          else skillCooldown = 10;
+          skillCooldown = 10;
         };
       }
+    });
+    socket.on('blindEffect', ({ duration }) => {
+      blindOverlay.style.display = 'flex';
+      setTimeout(() => {
+        blindOverlay.style.display = 'none';
+      }, duration || 1000);
     });
 
     // ====== 게임 화면 ======
@@ -336,7 +346,7 @@
       const rect = canvas.getBoundingClientRect();
       let y = e.clientY - rect.top;
       const ch = canvas.height;
-      // 서버에서 받은 패들 높이 사용
+
       const paddleHeight = (window.lastGameState && window.lastGameState.paddleHeight)
         ? window.lastGameState.paddleHeight[myPaddleIndex] / 500 * ch
         : ch * 0.15;
