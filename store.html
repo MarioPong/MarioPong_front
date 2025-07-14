@@ -11,6 +11,7 @@
 
 <body>
   <button class="back-btn" onclick="goBack()">Back</button>
+
   <div class="store-bg">
     <div class="store-card">
       <div class="store-header">
@@ -20,28 +21,32 @@
           <span class="store-coin-amount" id="coinAmount">0</span>
         </div>
       </div>
+
       <div class="store-characters" id="characterList">
-        <!-- JS will render character cards here -->
+        <!-- 캐릭터 카드 출력 -->
       </div>
     </div>
   </div>
+
+  <!-- 캐릭터 상세 모달 -->
   <div id="characterDetailModal" class="character-detail-modal" style="display:none;">
     <div class="character-detail-content">
       <button class="modal-close-btn" onclick="closeCharacterModal()">×</button>
       <div class="character-detail-header">
-        <span class="character-detail-title">Store</span>
+        <span class="character-detail-title">Character</span>
         <div class="character-detail-coin-box">
           <img src="img/item/coin.png" alt="coin" class="store-coin" />
-          <span class="store-coin-amount" id="modalCoinAmount">0</span>
+          <span class="store-coin-amount" id="modalCoinAmount"></span>
         </div>
       </div>
+
       <div class="character-detail-body">
         <div class="character-detail-img-box">
           <img id="modalCharacterImg" src="" alt="Character" class="character-img" />
-          <div id="modalOwnedLabel" class="owned-label" style="margin-top:16px;"></div>
+          <div id="modalOwnedLabel" class="owned-label"></div>
         </div>
         <div class="character-detail-info">
-          <div class="character-detail-name" id="modalCharacterName">Name: </div>
+          <div class="character-detail-name" id="modalCharacterName">Name:</div>
           <div class="character-detail-skill-label" id="modalSkillLabel">Skill:</div>
           <div class="character-detail-skill-text" id="modalSkillText"></div>
           <div class="character-detail-skill-label">Description:</div>
@@ -51,17 +56,28 @@
           <img id="modalItemImg" src="img/item/mushroom.png" alt="item" class="character-detail-item-img" />
         </div>
       </div>
+      <div class="character-detail-footer">
+        <button id="buyButton" class="mode-btn" style="display:none;">Buy</button>
+      </div>
     </div>
   </div>
+
   <script>
-    function goBack() {
-      window.location.href = 'main.html';
-    }
-    // 임시
+    let ownedCharacters = JSON.parse(localStorage.getItem('characters') || '[]');
+
+    // 콘솔로 확인 -> 맞음
+    console.log('ownedCharacters:', ownedCharacters);
+
     const user = {
-      coins: 500,
-      owned: ['mario']
+      coins: Number(localStorage.getItem('userGold') ?? '0'),
+      owned: ownedCharacters
     };
+
+    const coinAmountEl = document.getElementById('coinAmount');
+    const modalCoinAmountEl = document.getElementById('modalCoinAmount');
+    coinAmountEl.textContent = user.coins;
+    modalCoinAmountEl.textContent = user.coins;
+
     const characters = [
       { key: 'mario', name: 'Mario', img: 'img/character/mario.png', price: 0 },
       { key: 'yoshi', name: 'Yoshi', img: 'img/character/yoshi.png', price: 700 },
@@ -70,9 +86,7 @@
       { key: 'donkikong', name: 'Donkey Kong', img: 'img/character/donkikong.png', price: 1500 },
       { key: 'peach', name: 'Princess Peach', img: 'img/character/princess_peach.png', price: 2000 }
     ];
-    document.getElementById('coinAmount').textContent = user.coins;
-    const list = document.getElementById('characterList');
-    // Item image mapping for each character
+
     const itemImages = {
       mario: 'img/item/mushroom.png',
       yoshi: 'img/item/spiny_shell.png',
@@ -81,54 +95,39 @@
       donkikong: 'img/item/triple_green_shell.png',
       peach: 'img/item/mini_mushroom.png'
     };
-    characters.forEach((char, idx) => {
+
+    const characterList = document.getElementById('characterList');
+
+    characters.forEach(char => {
       const owned = user.owned.includes(char.key);
       const card = document.createElement('div');
       card.className = 'character-card';
       card.innerHTML = `
         <div class="character-img-box">
-          ${char.img ? `<img src="${char.img}" alt="${char.name}" class="character-img" />` : `<div class='character-placeholder'>?</div>`}
+          <img src="${char.img}" alt="${char.name}" class="character-img" />
         </div>
         <div class="character-footer ${owned ? 'owned' : 'not-owned'}">
-          ${owned ? '<span class="owned-label">Owned</span>' : `<img src='img/item/coin.png' class='footer-coin'/> <span class='price'>${char.price}</span>`}
+          ${owned
+          ? '<span class="owned-label">Owned</span>'
+          : `<img src="img/item/coin.png" class="footer-coin"/> <span class="price">${char.price}</span>`
+        }
         </div>
       `;
-      card.addEventListener('click', (e) => {
-        card.classList.add('clicked');
-        setTimeout(() => {
-          card.classList.remove('clicked');
-          openCharacterModal(char, owned);
-        }, 180);
-      });
-      list.appendChild(card);
+      card.addEventListener('click', () => openCharacterModal(char));
+      characterList.appendChild(card);
     });
 
-    // Modal logic
-    function openCharacterModal(char, owned) {
-      console.log('Opening modal for:', char.name); // 디버깅용
+    function openCharacterModal(char) {
+      const owned = user.owned.includes(char.key);
 
-      document.getElementById('modalCharacterImg').src = char.img || '';
+      document.getElementById('modalCharacterImg').src = char.img;
       document.getElementById('modalCharacterImg').alt = char.name;
       document.getElementById('modalCharacterName').textContent = `Name: ${char.name}`;
-      document.getElementById('modalCoinAmount').textContent = user.coins;
+      modalCoinAmountEl.textContent = user.coins;
+
       document.getElementById('modalOwnedLabel').textContent = owned ? 'Owned' : '';
       document.getElementById('modalOwnedLabel').style.display = owned ? 'block' : 'none';
 
-      // Character descriptions
-      const characterDescriptions = {
-        mario: 'Mario is a cheerful and heroic plumber known for his bravery, jumping skills, and versatility in sports and adventures across the Mushroom Kingdom.',
-        donkikong: 'Donkey Kong is a powerful jungle king with a love for bananas and a signature red necktie, known for his immense strength and barrel-throwing.',
-        yoshi: 'Yoshi is a kind, green dinosaur from Yoshi\'s Island who uses his tongue to eat enemies and turn them into eggs.',
-        koopa: 'Koopa is the fire-breathing King of the Koopas and Mario\'s main rival, constantly threatening the Mushroom Kingdom with his powerful minions.',
-        kinopio: 'Toad is a cheerful and loyal servant of Princess Peach who supports Mario and Luigi, often risking himself to help protect the kingdom.',
-        peach: 'Princess Peach is the kind-hearted ruler of the Mushroom Kingdom who loves baking, sports, and working toward harmony for all.'
-      };
-
-      const description = characterDescriptions[char.key] || '';
-      const skillText = document.getElementById('modalSkillText');
-      const descriptionElement = document.getElementById('modalDescription');
-
-      // Skill names and descriptions for each character
       const skillNames = {
         mario: 'Red Mushroom',
         yoshi: 'Super Shell',
@@ -147,31 +146,85 @@
         peach: 'Shrinks the opponent\'s racket size.'
       };
 
-      const skillName = skillNames[char.key] || 'Unknown Skill';
-      const skillDescription = skillDescriptions[char.key] || 'No skill available';
+      const descriptions = {
+        mario: 'Mario is a cheerful and heroic plumber.',
+        yoshi: 'Yoshi is a kind, green dinosaur.',
+        koopa: 'Koopa is the fire-breathing King of the Koopas.',
+        kinopio: 'Toad is a cheerful and loyal servant.',
+        donkikong: 'Donkey Kong is a powerful jungle king.',
+        peach: 'Princess Peach is the kind-hearted ruler.'
+      };
 
-      // Update skill label to include skill name
-      document.getElementById('modalSkillLabel').textContent = `Skill: ${skillName}`;
-      skillText.textContent = skillDescription;
+      document.getElementById('modalSkillLabel').textContent = `Skill: ${skillNames[char.key] ?? 'Unknown'}`;
+      document.getElementById('modalSkillText').textContent = skillDescriptions[char.key] ?? 'No skill available.';
+      document.getElementById('modalDescription').textContent = descriptions[char.key] ?? '';
+      document.getElementById('modalItemImg').src = itemImages[char.key] ?? 'img/item/mushroom.png';
 
-      // Description without gray box
-      descriptionElement.textContent = description;
+      const buyButton = document.getElementById('buyButton');
+      if (owned || char.price === 0) {
+        buyButton.style.display = 'none';
+      } else {
+        buyButton.style.display = 'inline-block';
+        buyButton.textContent = `Buy for ${char.price}`;
+        buyButton.onclick = () => buyCharacter(char);
+      }
 
-      // Use unique item image if available, else fallback
-      const itemImg = itemImages[char.key] || 'img/item/mushroom.png';
-      document.getElementById('modalItemImg').src = itemImg;
-
-      const modal = document.getElementById('characterDetailModal');
-      modal.style.display = 'flex';
-      console.log('Modal display set to flex'); // 디버깅용
+      document.getElementById('characterDetailModal').style.display = 'flex';
     }
+
+    function buyCharacter(char) {
+      // 항상 localStorage에서 소유 캐릭터 가져오기
+      let ownedCharacters = JSON.parse(localStorage.getItem('characters') || '[]');
+
+      // 'mario'는 항상 포함
+      if (!ownedCharacters.includes('Mario')) {
+        ownedCharacters.push('Mario');
+      }
+
+      // 새로 산 캐릭터 추가 (중복 방지)
+      if (!ownedCharacters.includes(char.key)) {
+        // [추가] 돈이 부족하면 구매 불가
+        if (user.coins < char.price) {
+          alert('코인이 부족합니다!');
+          return;
+        }
+        ownedCharacters.push(char.key);
+      } else {
+        alert('이미 소유한 캐릭터입니다!');
+        return; // 이미 있으면 더 진행 안 함
+      }
+
+      // localStorage에 최신 ownedCharacters 저장
+      localStorage.setItem('characters', JSON.stringify(ownedCharacters));
+
+      // user.owned 동기화
+      user.owned = ownedCharacters;
+
+      // 코인 차감 및 저장
+      user.coins -= char.price;
+      localStorage.setItem('userGold', user.coins); // ← key를 userGold로 변경
+
+      // UI 갱신 (코인 표시)
+      document.getElementById('coinAmount').textContent = user.coins;
+      document.getElementById('modalCoinAmount').textContent = user.coins;
+
+      // 알림 & 새로고침
+      alert(`${char.name} 구매 완료!`);
+      window.location.reload();
+    }
+
+
     function closeCharacterModal() {
       document.getElementById('characterDetailModal').style.display = 'none';
     }
-    // Close modal when clicking outside content
-    document.getElementById('characterDetailModal').addEventListener('click', function (e) {
-      if (e.target === this) closeCharacterModal();
+
+    document.getElementById('characterDetailModal').addEventListener('click', e => {
+      if (e.target === e.currentTarget) closeCharacterModal();
     });
+
+    function goBack() {
+      window.location.href = 'main.html';
+    }
   </script>
 </body>
 
