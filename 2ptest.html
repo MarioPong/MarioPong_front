@@ -166,7 +166,8 @@
       context.clearRect(0, 0, canvas.width, canvas.height);
       hideResultModal();
       hideRoomModal();
-      //roomInfoBox.style.display = 'none';
+      roomInfoBox.innerHTML = '';
+      roomInfoBox.style.display = 'block';
     }
     function showGame() {
       lobbyScreen.style.display = 'none';
