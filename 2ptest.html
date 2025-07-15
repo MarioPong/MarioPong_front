@@ -107,7 +107,7 @@
         <div class="ready-room-row">
           <span class="ready-room-label">Enter:</span>
           <input id="roomInput" class="ready-room-input" type="text" placeholder="Enter Room" />
-          <button class="ready-room-btn" id="joinBtn" onclick="makeOrJoinRoom()">Make/Join</button>
+          <button class="ready-room-btn" id="joinBtn">Make/Join</button>
         </div>
 
         <!-- 플레이어 준비창 -->
@@ -125,8 +125,8 @@
           <!-- 중앙(방 정보+버튼) -->
           <div class="ready-center-col">
             <div class="ready-room-name" id="roomNameDisplay">(Room name)</div>
-            <button class="ready-action-btn" id="readyBtn" disabled>Ready</button>
-            <button class="ready-action-btn leave" id="leaveBtn" disabled>Exit</button>
+            <button class="ready-action-btn" id="readyBtn">Ready</button>
+            <button class="ready-action-btn leave" id="leaveBtn">Exit</button>
           </div>
           <!-- P2 -->
           <div class="ready-player-col">
@@ -187,7 +187,7 @@
     // 디자인 캐릭터와 for2ppl 상태 동기화용 변수
     let socket = io('https://mariopong-back-4cre.onrender.com/pong');
     let joined = false, currentRoom = null, myPaddleIndex = null, gameActive = false;
-    let userName = localStorage.getItem('userName') || '익명';
+    let userName = localStorage.getItem('userName') || 'Unknown';
     let characters = JSON.parse(localStorage.getItem('characters') || '["Mario"]');
     let skillCooldown = 10, lastSkillTime = 0, skillReady = false;
     let myCharacter = localStorage.getItem('character_now') || characters[0];
@@ -254,7 +254,7 @@
         if (p2.id === socket.id) p2Dropdown.appendChild(createCharacterDropdown(2, p2.character));
         else p2Dropdown.textContent = p2.character || 'Choose Character';
       }
-      document.getElementById('roomTitle').textContent = "Pong PvP";
+      document.getElementById('roomTitle').textContent = "Ready";
       document.getElementById('roomNameDisplay').textContent = currentRoom || '(Enter Room Name)';
     });
 
@@ -272,7 +272,7 @@
       document.getElementById('roomNameDisplay').textContent = room;
       document.getElementById('error').innerText = '';
     }
-    document.getElementById('leaveBtn').onclick = function () {
+    document.getElementById('leaveBtn').onclick = function () { // 이거 안됨
       if (joined && currentRoom) {
         socket.emit('leaveRoom', currentRoom);
         joined = false; currentRoom = null;
@@ -286,6 +286,7 @@
       document.getElementById('status').innerText = 'Ready! Waiting for...';
       document.getElementById('readyBtn').disabled = true;
     };
+
     document.getElementById('toLobbyBtn').onclick = function () { location.reload(); };
     document.getElementById('toLobbyBtnModal').onclick = function () { location.reload(); };
     document.getElementById('exitGameBtn').onclick = function () {
@@ -295,6 +296,7 @@
       document.getElementById('readyBtn').disabled = false;
       document.getElementById('leaveBtn').disabled = false;
     };
+
     // --- 상태/게임이동/스킬바 ---
     socket.on('enteredRoom', (index) => {
       document.getElementById('status').innerText = 'You entered the room. Please push the ready button!';
@@ -320,6 +322,7 @@
       document.getElementById('status').innerText = 'Server disconnected';
       joined = false; currentRoom = null; gameActive = false;
     });
+
     function showResultModal(winner, score) {
       document.getElementById('resultTitle').innerText = (myPaddleIndex === winner) ? "Win!" : "Loose!";
       document.getElementById('resultScore').innerText = `Score: ${score[0]} : ${score[1]}`;
