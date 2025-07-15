@@ -197,7 +197,7 @@
       alert(`${char.name} 구매 완료!`);
 
       // 유저 업데이트 api
-      updateUserInfo();
+      updateUserGold();
 
       window.location.reload();
     }
@@ -232,6 +232,36 @@
         .then(result => {
           if (result.success) {
             console.log("유저 정보 업데이트 완료");
+          } else {
+            console.log(result.message)
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          alert('네트워크 오류: ' + err.message);
+        });
+    }
+
+    function updateUserGold() {
+      console.log("updating user gold");
+      let userId = localStorage.getItem('userId');
+      let gold = localStorage.getItem('gold');
+      
+      fetch('https://mariopong-back-4cre.onrender.com/api/user/update/gold', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          id: userId,
+          gold: gold
+        }),
+        credentials: 'include'
+      })
+        .then(res => res.json())
+        .then(result => {
+          if (result.success) {
+            console.log("유저 정보(gold) 업데이트 완료");
           } else {
             console.log(result.message)
           }
