@@ -272,7 +272,7 @@
       document.getElementById('roomNameDisplay').textContent = room;
       document.getElementById('error').innerText = '';
     }
-    document.getElementById('leaveBtn').onclick = function () {
+    document.getElementById('leaveBtn').onclick = function () { // 이거 안됨
       if (joined && currentRoom) {
         socket.emit('leaveRoom', currentRoom);
         joined = false; currentRoom = null;
@@ -286,6 +286,7 @@
       document.getElementById('status').innerText = 'Ready! Waiting for...';
       document.getElementById('readyBtn').disabled = true;
     };
+
     document.getElementById('toLobbyBtn').onclick = function () { location.reload(); };
     document.getElementById('toLobbyBtnModal').onclick = function () { location.reload(); };
     document.getElementById('exitGameBtn').onclick = function () {
@@ -295,6 +296,7 @@
       document.getElementById('readyBtn').disabled = false;
       document.getElementById('leaveBtn').disabled = false;
     };
+
     // --- 상태/게임이동/스킬바 ---
     socket.on('enteredRoom', (index) => {
       document.getElementById('status').innerText = 'You entered the room. Please push the ready button!';
@@ -320,6 +322,7 @@
       document.getElementById('status').innerText = 'Server disconnected';
       joined = false; currentRoom = null; gameActive = false;
     });
+
     function showResultModal(winner, score) {
       document.getElementById('resultTitle').innerText = (myPaddleIndex === winner) ? "Win!" : "Loose!";
       document.getElementById('resultScore').innerText = `Score: ${score[0]} : ${score[1]}`;
