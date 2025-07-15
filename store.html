@@ -75,7 +75,6 @@
     const coinAmountEl = document.getElementById('coinAmount');
     const modalCoinAmountEl = document.getElementById('modalCoinAmount');
     coinAmountEl.textContent = userGold;
-    //modalCoinAmountEl.textContent = user.coins;
 
     const characters = [
       { key: 'Mario', name: 'Mario', img: 'img/character/mario.png', price: 0 },
@@ -193,13 +192,54 @@
 
       // 코인 표시
       document.getElementById('coinAmount').textContent = user.coins;
-      document.getElementById('modalCoinAmount').textContent = user.coins;
 
       // 알림 & 새로고침
       alert(`${char.name} 구매 완료!`);
+
+      // 유저 업데이트 api
+      updateUserInfo();
+
       window.location.reload();
     }
 
+    function updateUserInfo() {
+      let userId = localStorage.getItem('userId');
+      let gold = localStorage.getItem('gold');
+      let score = localStorage.getItem('score');
+      let characters = JSON.parse(localStorage.getItem('characters'));
+      let records = JSON.parse(localStorage.getItem('records'));
+      let wins = localStorage.getItem('wins');
+      let losses = localStorage.getItem('losses');
+
+      fetch('https://mariopong-back-4cre.onrender.com/api/user/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          id: userId,
+          gold: gold,
+          score: score,
+          character_own: characters,
+          records: records,
+          wins: wins,
+          losses: losses
+        }),
+        credentials: 'include'
+      })
+        .then(res => res.json())
+        .then(result => {
+          if (result.success) {
+            console.log("유저 정보 업데이트 완료");
+          } else {
+            console.log("유저 정보 업데이트 실패")
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          alert('네트워크 오류: ' + err.message);
+        });
+    }
 
     function closeCharacterModal() {
       document.getElementById('characterDetailModal').style.display = 'none';

@@ -71,6 +71,9 @@
             localStorage.setItem('gold', result.gold);
             localStorage.setItem('score', result.score);
             localStorage.setItem('characters', JSON.stringify(result.characters));
+            localStorage.setItem('records', JSON.stringify(result.records));
+            localStorage.setItem('wins', result.wins);
+            localStorage.setItem('losses', result.losses);
             window.location.href = 'main.html';
           } else {
             alert(result.message || '로그인 실패');
