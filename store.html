@@ -207,8 +207,8 @@
       let userId = localStorage.getItem('userId');
       let gold = localStorage.getItem('gold');
       let score = localStorage.getItem('score');
-      let characters = JSON.parse(localStorage.getItem('characters'));
-      let records = JSON.parse(localStorage.getItem('records'));
+      let characters = JSON.parse(localStorage.getItem('characters') || '[]');
+      let records = JSON.parse(localStorage.getItem('records') || '[]');
       let wins = localStorage.getItem('wins');
       let losses = localStorage.getItem('losses');
 
