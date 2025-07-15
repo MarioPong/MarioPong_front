@@ -233,7 +233,7 @@
           if (result.success) {
             console.log("유저 정보 업데이트 완료");
           } else {
-            console.log("유저 정보 업데이트 실패")
+            console.log(result.message)
           }
         })
         .catch(err => {
