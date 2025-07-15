@@ -73,17 +73,17 @@
     };
 
     const coinAmountEl = document.getElementById('coinAmount');
-    const modalCoinAmountEl = document.getElementById('modalCoinAmount');
-    coinAmountEl.textContent = user.coins;
+    coinAmountEl.textContent = userGold;
+    //const modalCoinAmountEl = document.getElementById('modalCoinAmount');
     //modalCoinAmountEl.textContent = user.coins;
 
     const characters = [
-      { key: 'mario', name: 'Mario', img: 'img/character/mario.png', price: 0 },
-      { key: 'yoshi', name: 'Yoshi', img: 'img/character/yoshi.png', price: 700 },
-      { key: 'koopa', name: 'Koopa', img: 'img/character/koopa.png', price: 1000 },
-      { key: 'kinopio', name: 'Kinopio', img: 'img/character/kinopio.png', price: 1200 },
-      { key: 'donkikong', name: 'Donkey Kong', img: 'img/character/donkikong.png', price: 1500 },
-      { key: 'peach', name: 'Princess Peach', img: 'img/character/princess_peach.png', price: 2000 }
+      { key: 'Mario', name: 'Mario', img: 'img/character/mario.png', price: 0 },
+      { key: 'Yoshi', name: 'Yoshi', img: 'img/character/yoshi.png', price: 700 },
+      { key: 'Koopa', name: 'Koopa', img: 'img/character/koopa.png', price: 1000 },
+      { key: 'Kinopio', name: 'Kinopio', img: 'img/character/kinopio.png', price: 1200 },
+      { key: 'DonkeyKong', name: 'Donkey Kong', img: 'img/character/donkikong.png', price: 1500 },
+      { key: 'PrincessPeach', name: 'Princess Peach', img: 'img/character/princess_peach.png', price: 2000 }
     ];
 
     const itemImages = {
@@ -99,7 +99,7 @@
 
     characters.forEach(char => {
       // 지우면 안됨..
-      const owned = user.owned.includes(char.key);
+      const owned = ownedCharacters.includes(char.key);
       const card = document.createElement('div');
       card.className = 'character-card';
       card.innerHTML = `
