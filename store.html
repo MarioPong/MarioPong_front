@@ -129,30 +129,30 @@
       document.getElementById('modalOwnedLabel').style.display = owned ? 'block' : 'none';
 
       const skillNames = {
-        mario: 'Red Mushroom',
-        yoshi: 'Super Shell',
-        kinopio: 'Squid',
-        donkikong: 'Triple Shell',
-        koopa: 'Fire Flower',
-        peach: 'Mini Mushroom'
+        Mario: 'Red Mushroom',
+        Yoshi: 'Super Shell',
+        Kinopio: 'Squid',
+        DonkeyKong: 'Triple Shell',
+        Koopa: 'Fire Flower',
+        PrincessPeach: 'Mini Mushroom'
       };
 
       const skillDescriptions = {
-        mario: 'His racket becomes larger.',
-        yoshi: 'Opponent\'s movement slows down next turn (shocked).',
-        kinopio: 'Temporarily blocks the opponent\'s vision with ink.',
-        donkikong: 'Throws 2 fake balls along with the real one.',
-        koopa: 'Throws a fast fireball.',
-        peach: 'Shrinks the opponent\'s racket size.'
+        Mario: 'His racket becomes larger.',
+        Yoshi: 'Opponent\'s movement slows down next turn (shocked).',
+        Kinopio: 'Temporarily blocks the opponent\'s vision with ink.',
+        DonkeyKong: 'Throws 2 fake balls along with the real one.',
+        Koopa: 'Throws a fast fireball.',
+        PrincessPeach: 'Shrinks the opponent\'s racket size.'
       };
 
       const descriptions = {
-        mario: 'Mario is a cheerful and heroic plumber.',
-        yoshi: 'Yoshi is a kind, green dinosaur.',
-        koopa: 'Koopa is the fire-breathing King of the Koopas.',
-        kinopio: 'Toad is a cheerful and loyal servant.',
-        donkikong: 'Donkey Kong is a powerful jungle king.',
-        peach: 'Princess Peach is the kind-hearted ruler.'
+        Mario: 'Mario is a cheerful and heroic plumber.',
+        Yoshi: 'Yoshi is a kind, green dinosaur.',
+        Koopa: 'Koopa is the fire-breathing King of the Koopas.',
+        Kinopio: 'Toad is a cheerful and loyal servant.',
+        DonkeyKong: 'Donkey Kong is a powerful jungle king.',
+        PrincessPeach: 'Princess Peach is the kind-hearted ruler.'
       };
 
       document.getElementById('modalSkillLabel').textContent = `Skill: ${skillNames[char.key] ?? 'Unknown'}`;
