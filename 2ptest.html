@@ -125,8 +125,8 @@
           <!-- 중앙(방 정보+버튼) -->
           <div class="ready-center-col">
             <div class="ready-room-name" id="roomNameDisplay">(Room name)</div>
-            <button class="ready-action-btn" id="readyBtn">Ready</button>
-            <button class="ready-action-btn leave" id="leaveBtn">Exit</button>
+            <button class="ready-action-btn" id="readyBtn" disabled>Ready</button>
+            <button class="ready-action-btn-leave" id="leaveBtn" disabled>Exit</button>
           </div>
           <!-- P2 -->
           <div class="ready-player-col">
@@ -271,7 +271,7 @@
       currentRoom = room;
       document.getElementById('roomNameDisplay').textContent = room;
       document.getElementById('error').innerText = '';
-    }
+    };
     document.getElementById('leaveBtn').onclick = function () { // 이거 안됨
       if (joined && currentRoom) {
         socket.emit('leaveRoom', currentRoom);
@@ -281,7 +281,8 @@
         document.getElementById('leaveBtn').disabled = true;
       }
     };
-    document.getElementById('readyBtn').onclick = function () {
+
+    document.getElementById('readyBtn').onclick = function () { // 이건 됨
       socket.emit('ready', myCharacter);
       document.getElementById('status').innerText = 'Ready! Waiting for...';
       document.getElementById('readyBtn').disabled = true;
@@ -289,7 +290,8 @@
 
     document.getElementById('toLobbyBtn').onclick = function () { location.reload(); };
     document.getElementById('toLobbyBtnModal').onclick = function () { location.reload(); };
-    document.getElementById('exitGameBtn').onclick = function () {
+
+    document.getElementById('exitGameBtn').onclick = function () { // 이거 안됨
       socket.emit('leaveRoom', currentRoom);
       joined = false; currentRoom = null;
       document.getElementById('gameScreen').style.display = 'none';
