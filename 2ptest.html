@@ -9,6 +9,73 @@
   <script>
     let Ownedcharacters = JSON.parse(localStorage.getItem('characters') || '["Mario"]');
     const owned = Ownedcharacters;
+    const characters = [
+      { key: 'Mario', name: 'Mario', img: 'img/character/mario.png' },
+      { key: 'Yoshi', name: 'Yoshi', img: 'img/character/yoshi.png' },
+      { key: 'DonkeyKong', name: 'Donkey Kong', img: 'img/character/donkikong.png' },
+      { key: 'Kinopio', name: 'Kinopio', img: 'img/character/kinopio.png' },
+      { key: 'Koopa', name: 'Koopa', img: 'img/character/koopa.png' },
+      { key: 'PrincessPeach', name: 'Princess Peach', img: 'img/character/princess_peach.png' }
+    ];
+    function createDropdown(selectedIdx, playerNum) {
+      const container = document.createElement('div');
+      container.className = 'dropdown-container';
+      const btn = document.createElement('button');
+      btn.className = 'dropdown-btn';
+      btn.type = 'button';
+      btn.innerHTML = `
+        <img src="${characters[selectedIdx].img}" class="dropdown-btn-img" alt="${characters[selectedIdx].name}" />
+        <span class="dropdown-btn-name">${characters[selectedIdx].name}</span>
+        <span class="dropdown-arrow">▼</span>
+      `;
+      const list = document.createElement('div');
+      list.className = 'dropdown-list';
+      const filteredCharacters = characters.filter(c => owned.includes(c.key));
+      filteredCharacters.forEach((c) => {
+        const item = document.createElement('div');
+        item.className = 'dropdown-item';
+        item.innerHTML = `
+          <img src="${c.img}" class="dropdown-item-img" alt="${c.name}" />
+          <span class="dropdown-item-name">${c.name}</span>
+        `;
+        item.onclick = () => {
+          btn.innerHTML = `
+          <img src="${c.img}" class="dropdown-btn-img" alt="${c.name}" />
+          <span class="dropdown-btn-name">${c.name}</span>
+          <span class="dropdown-arrow">▼</span>
+        `;
+          list.style.display = 'none';
+          const col = btn.closest('.ready-player-col');
+          if (col) {
+            const img = col.querySelector('.ready-player-img');
+            if (img) img.src = c.img;
+          }
+          // 캐릭터 선택 시 서버로 emit
+          myCharacter = c.name;
+          socket.emit('selectCharacter', c.name);
+          localStorage.setItem('character_now', c.name);
+        };
+        list.appendChild(item);
+      });
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        list.style.display = list.style.display === 'block' ? 'none' : 'block';
+      };
+      container.appendChild(btn);
+      container.appendChild(list);
+      document.addEventListener('click', function closeDropdown(e) {
+        if (!container.contains(e.target)) {
+          list.style.display = 'none';
+        }
+      });
+      return container;
+    }
+    function initCustomDropdowns() {
+      document.querySelectorAll('.custom-character-dropdown').forEach((el) => {
+        el.innerHTML = '';
+        el.appendChild(createDropdown(0, el.dataset.player));
+      });
+    }
     function startGame(mode) {
       if (mode === 'single') {
         window.location.href = 'marioPong.html';
@@ -128,7 +195,7 @@
     let gameActive = false;
     let playerIndex = 2;
     let userName = localStorage.getItem('userName') || '익명';
-    let characters = JSON.parse(localStorage.getItem('characters') || '["Mario"]');
+    // characters 변수는 아래에서 배열로 선언됨
     let skillCooldown = 10; // 기본값, 캐릭터에 따라 변경
     let lastSkillTime = 0;
     let skillReady = false;
@@ -315,34 +382,57 @@
       }
     });
     socket.on('roomInfo', (players) => {
-      if (!players || players.length === 0) {
-        roomInfoBox.innerHTML = '';
-        return;
+      // 방장(먼저 입장한 사람)이 항상 P1(왼쪽)에 오도록 정렬 (joinedAt 또는 createdAt 필요)
+      if (players[0] && players[1] && players[1].createdAt < players[0].createdAt) {
+        players = [players[1], players[0]];
       }
-      let html = `<strong>Room: ${currentRoom}</strong><br>`;
-      players.forEach((p, i) => {
-        // 내 소켓 ID와 비교해 내 영역에만 select 표시
-        if (p.id === socket.id) {
-          html += `P${i + 1}: ${p.userName} (${p.ready ? '✅' : '❌'})<br>`;
-          html += `<select id="characterSelect">
-            ${characters.map(ch => `<option value="${ch}" ${p.character === ch ? 'selected' : ''}>${ch}</option>`).join('')}
-          </select><br>`;
-        } else {
-          html += `P${i + 1}: ${p.userName} (${p.ready ? '✅' : '❌'}) - <span>${p.character || 'Not selected'}</span><br>`;
+      // P1/P2 이름 및 상태 표시
+      const p1Label = document.getElementById('player1Name');
+      const p2Label = document.getElementById('player2Name');
+      const p1Status = document.getElementById('player1Status');
+      const p2Status = document.getElementById('player2Status');
+      if (p1Label && players[0]) p1Label.innerText = players[0].userName || 'P1';
+      if (p2Label && players[1]) p2Label.innerText = players[1].userName || 'P2';
+      if (p1Status && players[0]) p1Status.textContent = players[0].ready ? '✔️' : '❌';
+      if (p2Status && players[1]) p2Status.textContent = players[1].ready ? '✔️' : '❌';
+      // 캐릭터 선택 드롭다운/표시
+      const p1Dropdown = document.querySelector('.custom-character-dropdown[data-player="1"]');
+      const p2Dropdown = document.querySelector('.custom-character-dropdown[data-player="2"]');
+      if (p1Dropdown) {
+        p1Dropdown.innerHTML = '';
+        if (players[0] && players[0].id === socket.id) {
+          p1Dropdown.appendChild(createCharacterSelect(players[0].character));
+        } else if (players[0]) {
+          p1Dropdown.innerHTML = `<span>${players[0].character || '미선택'}</span>`;
         }
-      });
-      roomInfoBox.innerHTML = html;
-
-      const select = document.getElementById('characterSelect');
-      if (select) {
-        select.onchange = function () {
-          myCharacter = select.value;
-          socket.emit('selectCharacter', select.value);
-          localStorage.setItem('character_now', select.value);
-          skillCooldown = 10;
-        };
+      }
+      if (p2Dropdown) {
+        p2Dropdown.innerHTML = '';
+        if (players[1] && players[1].id === socket.id) {
+          p2Dropdown.appendChild(createCharacterSelect(players[1].character));
+        } else if (players[1]) {
+          p2Dropdown.innerHTML = `<span>${players[1].character || '미선택'}</span>`;
+        }
       }
     });
+    // 캐릭터 선택 드롭다운 생성 함수
+    function createCharacterSelect(selected) {
+      const select = document.createElement('select');
+      select.className = 'character-select';
+      characters.forEach(ch => {
+        const option = document.createElement('option');
+        option.value = ch;
+        option.textContent = ch;
+        if (ch === selected) option.selected = true;
+        select.appendChild(option);
+      });
+      select.onchange = function () {
+        myCharacter = select.value;
+        socket.emit('selectCharacter', select.value);
+        localStorage.setItem('character_now', select.value);
+      };
+      return select;
+    }
     socket.on('blindEffect', ({ duration }) => {
       blindOverlay.style.display = 'flex';
       setTimeout(() => {
