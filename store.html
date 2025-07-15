@@ -63,13 +63,12 @@
   </div>
 
   <script>
-    let ownedCharacters = JSON.parse(localStorage.getItem('characters') || '[]');
+    let ownedCharacters = JSON.parse(localStorage.getItem('characters') || '["Mario"]');
+    let userGold = Number(localStorage.getItem('gold'));
 
-    // 콘솔로 확인 -> 맞음
-    console.log('ownedCharacters:', ownedCharacters);
-
+    // Local
     const user = {
-      coins: Number(localStorage.getItem('userGold') ?? '0'),
+      coins: userGold,
       owned: ownedCharacters
     };
 
@@ -99,12 +98,13 @@
     const characterList = document.getElementById('characterList');
 
     characters.forEach(char => {
+      // 지우면 안됨..
       const owned = user.owned.includes(char.key);
       const card = document.createElement('div');
       card.className = 'character-card';
       card.innerHTML = `
         <div class="character-img-box">
-          <img src="${char.img}" alt="${char.name}" class="character-img" />
+          ${char.img ? `<img src="${char.img}" alt="${char.name}" class="character-img" />` : `<div class='character-placeholder'>?</div>`}
         </div>
         <div class="character-footer ${owned ? 'owned' : 'not-owned'}">
           ${owned
@@ -173,17 +173,9 @@
     }
 
     function buyCharacter(char) {
-      // 항상 localStorage에서 소유 캐릭터 가져오기
-      let ownedCharacters = JSON.parse(localStorage.getItem('characters') || '[]');
-
-      // 'mario'는 항상 포함
-      if (!ownedCharacters.includes('Mario')) {
-        ownedCharacters.push('Mario');
-      }
-
-      // 새로 산 캐릭터 추가 (중복 방지)
+      // 새로 산 캐릭터 중복 방지
       if (!ownedCharacters.includes(char.key)) {
-        // [추가] 돈이 부족하면 구매 불가
+        // 돈이 부족하면 구매 불가
         if (user.coins < char.price) {
           alert('코인이 부족합니다!');
           return;
@@ -191,20 +183,15 @@
         ownedCharacters.push(char.key);
       } else {
         alert('이미 소유한 캐릭터입니다!');
-        return; // 이미 있으면 더 진행 안 함
+        return;
       }
-
-      // localStorage에 최신 ownedCharacters 저장
-      localStorage.setItem('characters', JSON.stringify(ownedCharacters));
-
-      // user.owned 동기화
-      user.owned = ownedCharacters;
 
       // 코인 차감 및 저장
       user.coins -= char.price;
-      localStorage.setItem('userGold', user.coins); // ← key를 userGold로 변경
+      localStorage.setItem('gold', user.coins);
+      localStorage.setItem('characters', JSON.stringify(ownedCharacters));
 
-      // UI 갱신 (코인 표시)
+      // 코인 표시
       document.getElementById('coinAmount').textContent = user.coins;
       document.getElementById('modalCoinAmount').textContent = user.coins;
 
