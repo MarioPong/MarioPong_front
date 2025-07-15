@@ -57,7 +57,15 @@
       </div>
     </div>
   </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.js" crossorigin="anonymous"></script>
   <script>
+    let Ownedcharacters = JSON.parse(localStorage.getItem('characters') || '["Mario"]');
+    const owned = Ownedcharacters;
+    let userName = localStorage.getItem('userName') || '익명';
+    let socket;
+    let isReady = false;
+    let currentRoom = null;
+
     function startGame(mode) {
       if (mode === 'single') {
         window.location.href = 'marioPong.html';
@@ -65,7 +73,15 @@
     }
     function showMultiModal() {
       document.getElementById('multiModal').style.display = 'flex';
-      setTimeout(initCustomDropdowns, 0); // Ensure DOM is ready
+      setTimeout(function () {
+        initCustomDropdowns();
+        // Always update P1 label with local userName and current ready state after dropdowns are initialized
+        updateP1Label(userName, isReady);
+      }, 0);
+      if (!socket) {
+        socket = io('https://mariopong-back-4cre.onrender.com/pong');
+        setupSocketEvents();
+      }
     }
     function closeMultiModal() {
       document.getElementById('multiModal').style.display = 'none';
@@ -73,47 +89,70 @@
     function goBack() {
       window.location.href = 'main.html';
     }
-    function makeRoom() {
-      alert('나중에..');
-    }
-    function participateRoom() {
-      alert('나중에..');
-    }
     function leaveRoom() {
-      alert('나중에..');
+      if (socket && currentRoom) {
+        socket.emit('leaveRoom', currentRoom);
+        currentRoom = null;
+        isReady = false;
+        updateP1Label(userName, isReady);
+      }
     }
     function readyRoom() {
-      alert('나중에..');
+      if (socket && currentRoom) {
+        isReady = !isReady;
+        socket.emit('ready', isReady);
+        updateP1Label(userName, isReady);
+      }
     }
-    // Custom Character Dropdown
+    // Update P1 nickname and ready icon (always use local userName)
+    function updateP1Label(nickname, ready) {
+      const p1Label = document.querySelectorAll('.ready-player-label')[0];
+      if (p1Label) {
+        p1Label.innerHTML = `P1: ${nickname}(<span class="ready-check" id="player1Status">${ready ? '✔️' : '❌'}</span>)`;
+      }
+    }
+    //Custom Character Dropdown
     const characters = [
-      { name: 'Mario', img: 'img/character/mario.png' },
-      { name: 'Yoshi', img: 'img/character/yoshi.png' },
-      { name: 'Donkey Kong', img: 'img/character/donkikong.png' },
-      { name: 'Kinopio', img: 'img/character/kinopio.png' },
-      { name: 'Koopa', img: 'img/character/koopa.png' },
-      { name: 'Princess Peach', img: 'img/character/princess_peach.png' }
+      { key: 'Mario', name: 'Mario', img: 'img/character/mario.png' },
+      { key: 'Yoshi', name: 'Yoshi', img: 'img/character/yoshi.png' },
+      { key: 'DonkeyKong', name: 'Donkey Kong', img: 'img/character/donkikong.png' },
+      { key: 'Kinopio', name: 'Kinopio', img: 'img/character/kinopio.png' },
+      { key: 'Koopa', name: 'Koopa', img: 'img/character/koopa.png' },
+      { key: 'PrincessPeach', name: 'Princess Peach', img: 'img/character/princess_peach.png' }
     ];
     function createDropdown(selectedIdx, playerNum) {
       const container = document.createElement('div');
       container.className = 'dropdown-container';
 
-      // Dropdown button
       const btn = document.createElement('button');
       btn.className = 'dropdown-btn';
       btn.type = 'button';
-      btn.innerHTML = `<img src="${characters[selectedIdx].img}" class="dropdown-btn-img" alt="${characters[selectedIdx].name}" /><span class="dropdown-btn-name">${characters[selectedIdx].name}</span><span class="dropdown-arrow">▼</span>`;
+      btn.innerHTML = `
+        <img src="${characters[selectedIdx].img}" class="dropdown-btn-img" alt="${characters[selectedIdx].name}" />
+        <span class="dropdown-btn-name">${characters[selectedIdx].name}</span>
+        <span class="dropdown-arrow">▼</span>
+      `;
 
-      // Dropdown list
       const list = document.createElement('div');
-      list.className = 'dropdown-list';
-      characters.forEach((c, idx) => {
+      list.className = 'dropdown-list'; // 추가
+
+      //localStorage
+      const filteredCharacters = characters.filter(c => owned.includes(c.key));
+      filteredCharacters.forEach((c) => {
         const item = document.createElement('div');
         item.className = 'dropdown-item';
-        item.innerHTML = `<img src="${c.img}" class="dropdown-item-img" alt="${c.name}" /><span class="dropdown-item-name">${c.name}</span>`;
+        item.innerHTML = `
+          <img src="${c.img}" class="dropdown-item-img" alt="${c.name}" />
+          <span class="dropdown-item-name">${c.name}</span>
+        `;
         item.onclick = () => {
-          btn.innerHTML = `<img src="${c.img}" class="dropdown-btn-img" alt="${c.name}" /><span class="dropdown-btn-name">${c.name}</span><span class="dropdown-arrow">▼</span>`;
+          btn.innerHTML = `
+          <img src="${c.img}" class="dropdown-btn-img" alt="${c.name}" />
+          <span class="dropdown-btn-name">${c.name}</span>
+          <span class="dropdown-arrow">▼</span>
+        `;
           list.style.display = 'none';
+
           // Update player image
           const col = btn.closest('.ready-player-col');
           if (col) {
@@ -123,18 +162,22 @@
         };
         list.appendChild(item);
       });
+
       btn.onclick = (e) => {
         e.stopPropagation();
         list.style.display = list.style.display === 'block' ? 'none' : 'block';
       };
+
       container.appendChild(btn);
       container.appendChild(list);
-      // Close dropdown on outside click
+
+      // Close dropdown when clicking outside
       document.addEventListener('click', function closeDropdown(e) {
         if (!container.contains(e.target)) {
           list.style.display = 'none';
         }
       });
+
       return container;
     }
     function initCustomDropdowns() {
@@ -144,34 +187,56 @@
         el.appendChild(createDropdown(0, el.dataset.player)); // 0 = Mario
       });
     }
-    // Add Ready/Leave button logic for player1 and player2 status emoji swap
+    // Add Ready/Leave button logic for player1 and player2
     document.addEventListener('DOMContentLoaded', function () {
       const readyBtn = document.getElementById('readyBtn');
       const leaveBtn = document.getElementById('leaveBtn');
-      const player1Status = document.getElementById('player1Status');
-      const player2Status = document.getElementById('player2Status');
-      if (readyBtn && leaveBtn && player1Status && player2Status) {
+      if (readyBtn && leaveBtn) {
         readyBtn.addEventListener('click', function () {
-          player1Status.textContent = '✔️';
-          player2Status.textContent = '✔️';
+          readyRoom();
         });
         leaveBtn.addEventListener('click', function () {
-          player1Status.textContent = '❌';
-          player2Status.textContent = '❌';
+          leaveRoom();
         });
       }
-      // (Room name live update logic removed as per user request)
     });
     function makeOrJoinRoom() {
       const roomInput = document.getElementById('room-number');
       const roomNameDiv = document.querySelector('.ready-room-name');
       const value = roomInput.value.trim() ? roomInput.value : '(Room name)';
       roomNameDiv.textContent = value;
-
+      currentRoom = value;
+      if (socket) {
+        socket.emit('joinRoom', value, userName);
+      }
       // 애니메이션 효과
-      roomNameDiv.classList.remove('animate'); // 연속 클릭 시 초기화
-      void roomNameDiv.offsetWidth; // reflow로 강제 재적용
+      roomNameDiv.classList.remove('animate');
+      void roomNameDiv.offsetWidth;
       roomNameDiv.classList.add('animate');
+      // 방 입장 시 P1 닉네임 갱신 (after dropdowns)
+      setTimeout(function () { updateP1Label(userName, isReady); }, 0);
+    }
+    function setupSocketEvents() {
+      socket.on('roomInfo', (players) => {
+        if (players && players.length > 0) {
+          // P1
+          updateP1Label(players[0].userName, !!players[0].ready);
+          // P2
+          if (players[1]) {
+            const p2Label = document.querySelectorAll('.ready-player-label')[1];
+            if (p2Label) {
+              p2Label.innerHTML = `P2: ${players[1].userName}(<span class=\"ready-x\" id=\"player2Status\">${players[1].ready ? '✔️' : '❌'}</span>)`;
+            }
+          } else {
+            // P2가 없으면 기본값
+            const p2Label = document.querySelectorAll('.ready-player-label')[1];
+            if (p2Label) {
+              p2Label.innerHTML = 'P2: (<span class="ready-x" id="player2Status">❌</span>)';
+            }
+          }
+        }
+      });
+      // 필요시 다른 socket 이벤트도 추가 가능
     }
   </script>
 </body>
