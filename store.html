@@ -74,32 +74,31 @@
 
     const coinAmountEl = document.getElementById('coinAmount');
     const modalCoinAmountEl = document.getElementById('modalCoinAmount');
-    coinAmountEl.textContent = user.coins;
-    modalCoinAmountEl.textContent = user.coins;
+    coinAmountEl.textContent = userGold;
 
     const characters = [
-      { key: 'mario', name: 'Mario', img: 'img/character/mario.png', price: 0 },
-      { key: 'yoshi', name: 'Yoshi', img: 'img/character/yoshi.png', price: 700 },
-      { key: 'koopa', name: 'Koopa', img: 'img/character/koopa.png', price: 1000 },
-      { key: 'kinopio', name: 'Kinopio', img: 'img/character/kinopio.png', price: 1200 },
-      { key: 'donkikong', name: 'Donkey Kong', img: 'img/character/donkikong.png', price: 1500 },
-      { key: 'peach', name: 'Princess Peach', img: 'img/character/princess_peach.png', price: 2000 }
+      { key: 'Mario', name: 'Mario', img: 'img/character/mario.png', price: 0 },
+      { key: 'Yoshi', name: 'Yoshi', img: 'img/character/yoshi.png', price: 700 },
+      { key: 'Koopa', name: 'Koopa', img: 'img/character/koopa.png', price: 1000 },
+      { key: 'Kinopio', name: 'Kinopio', img: 'img/character/kinopio.png', price: 1200 },
+      { key: 'DonkeyKong', name: 'Donkey Kong', img: 'img/character/donkikong.png', price: 1500 },
+      { key: 'PrincessPeach', name: 'Princess Peach', img: 'img/character/princess_peach.png', price: 2000 }
     ];
 
     const itemImages = {
-      mario: 'img/item/mushroom.png',
-      yoshi: 'img/item/spiny_shell.png',
-      koopa: 'img/item/fire_flower.png',
-      kinopio: 'img/item/blooper.png',
-      donkikong: 'img/item/triple_green_shell.png',
-      peach: 'img/item/mini_mushroom.png'
+      Mario: 'img/item/mushroom.png',
+      Yoshi: 'img/item/spiny_shell.png',
+      Koopa: 'img/item/fire_flower.png',
+      Kinopio: 'img/item/blooper.png',
+      DonkeyKong: 'img/item/triple_green_shell.png',
+      PrincessPeach: 'img/item/mini_mushroom.png'
     };
 
     const characterList = document.getElementById('characterList');
 
     characters.forEach(char => {
       // 지우면 안됨..
-      const owned = user.owned.includes(char.key);
+      const owned = ownedCharacters.includes(char.key);
       const card = document.createElement('div');
       card.className = 'character-card';
       card.innerHTML = `
@@ -129,30 +128,30 @@
       document.getElementById('modalOwnedLabel').style.display = owned ? 'block' : 'none';
 
       const skillNames = {
-        mario: 'Red Mushroom',
-        yoshi: 'Super Shell',
-        kinopio: 'Squid',
-        donkikong: 'Triple Shell',
-        koopa: 'Fire Flower',
-        peach: 'Mini Mushroom'
+        Mario: 'Red Mushroom',
+        Yoshi: 'Super Shell',
+        Kinopio: 'Squid',
+        DonkeyKong: 'Triple Shell',
+        Koopa: 'Fire Flower',
+        PrincessPeach: 'Mini Mushroom'
       };
 
       const skillDescriptions = {
-        mario: 'His racket becomes larger.',
-        yoshi: 'Opponent\'s movement slows down next turn (shocked).',
-        kinopio: 'Temporarily blocks the opponent\'s vision with ink.',
-        donkikong: 'Throws 2 fake balls along with the real one.',
-        koopa: 'Throws a fast fireball.',
-        peach: 'Shrinks the opponent\'s racket size.'
+        Mario: 'His racket becomes larger.',
+        Yoshi: 'Opponent\'s movement slows down next turn (shocked).',
+        Kinopio: 'Temporarily blocks the opponent\'s vision with ink.',
+        DonkeyKong: 'Throws 2 fake balls along with the real one.',
+        Koopa: 'Throws a fast fireball.',
+        PrincessPeach: 'Shrinks the opponent\'s racket size.'
       };
 
       const descriptions = {
-        mario: 'Mario is a cheerful and heroic plumber.',
-        yoshi: 'Yoshi is a kind, green dinosaur.',
-        koopa: 'Koopa is the fire-breathing King of the Koopas.',
-        kinopio: 'Toad is a cheerful and loyal servant.',
-        donkikong: 'Donkey Kong is a powerful jungle king.',
-        peach: 'Princess Peach is the kind-hearted ruler.'
+        Mario: 'Mario is a cheerful and heroic plumber.',
+        Yoshi: 'Yoshi is a kind, green dinosaur.',
+        Koopa: 'Koopa is the fire-breathing King of the Koopas.',
+        Kinopio: 'Toad is a cheerful and loyal servant.',
+        DonkeyKong: 'Donkey Kong is a powerful jungle king.',
+        PrincessPeach: 'Princess Peach is the kind-hearted ruler.'
       };
 
       document.getElementById('modalSkillLabel').textContent = `Skill: ${skillNames[char.key] ?? 'Unknown'}`;
@@ -193,13 +192,85 @@
 
       // 코인 표시
       document.getElementById('coinAmount').textContent = user.coins;
-      document.getElementById('modalCoinAmount').textContent = user.coins;
 
       // 알림 & 새로고침
       alert(`${char.name} 구매 완료!`);
+
+      // 유저 업데이트 api
+      updateUserGold();
+
       window.location.reload();
     }
 
+    function updateUserInfo() {
+      console.log("updating user info");
+      let userId = localStorage.getItem('userId');
+      let gold = localStorage.getItem('gold');
+      let score = localStorage.getItem('score');
+      let characters = JSON.parse(localStorage.getItem('characters') || '[]');
+      let records = JSON.parse(localStorage.getItem('records') || '[]');
+      let wins = localStorage.getItem('wins');
+      let losses = localStorage.getItem('losses');
+
+      fetch('https://mariopong-back-4cre.onrender.com/api/user/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          id: userId,
+          gold: gold,
+          score: score,
+          character_own: characters,
+          records: records,
+          wins: wins,
+          losses: losses
+        }),
+        credentials: 'include'
+      })
+        .then(res => res.json())
+        .then(result => {
+          if (result.success) {
+            console.log("유저 정보 업데이트 완료");
+          } else {
+            console.log(result.message)
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          alert('네트워크 오류: ' + err.message);
+        });
+    }
+
+    function updateUserGold() {
+      console.log("updating user gold");
+      let userId = localStorage.getItem('userId');
+      let gold = localStorage.getItem('gold');
+      
+      fetch('https://mariopong-back-4cre.onrender.com/api/user/update-gold', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          id: userId,
+          gold: gold
+        }),
+        credentials: 'include'
+      })
+        .then(res => res.json())
+        .then(result => {
+          if (result.success) {
+            console.log("유저 정보(gold) 업데이트 완료");
+          } else {
+            console.log(result.message)
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          alert('네트워크 오류: ' + err.message);
+        });
+    }
 
     function closeCharacterModal() {
       document.getElementById('characterDetailModal').style.display = 'none';
