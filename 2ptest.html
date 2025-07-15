@@ -70,17 +70,16 @@
     <div class="game-select-card" style="padding:0;">
       <!-- 헤더 -->
       <div class="game-select-header" style="margin-bottom:0;">
-        <button class="back-btn" id="toLobbyBtn" style="position:absolute;left:30px;top:30px;">로비로</button>
-        <span class="game-select-title" id="roomTitle" style="padding:36px 0 10px 0;">Pong PvP 준비 화면</span>
+        <button class="back-btn" id="toLobbyBtn" style="position:absolute;left:30px;top:30px;">Lobby</button>
+        <span class="game-select-title" id="roomTitle" style="padding:36px 0 10px 0;">Mario-Pong PvP</span>
       </div>
       <!-- 카드 내부 컨텐츠 -->
       <div class="ready-modal" style="box-shadow:none; border:none; min-width:auto; max-width:none; padding:0;">
         <!-- 방 설정 입력 -->
         <div class="ready-room-row">
-          <span class="ready-room-label">방 이름:</span>
-          <input id="roomInput" class="ready-room-input" type="text" placeholder="방 이름 입력"/>
-          <button class="ready-room-btn" id="createBtn">방 만들기</button>
-          <button class="ready-room-btn" id="joinBtn">방 참가하기</button>
+          <span class="ready-room-label">Room:</span>
+          <input id="roomInput" class="ready-room-input" type="text" placeholder="Enter Room Name"/>
+          <button class="ready-room-btn" id="joinBtn">Make/Join</button>
         </div>
 
         <!-- 플레이어 준비창 -->
@@ -91,15 +90,15 @@
               P1: <span id="p1Name"></span> (<span class="ready-check" id="p1Status">❌</span>)
             </div>
             <div class="ready-player-img-box">
-              <img src="img/character/mario.png" class="ready-player-img" id="p1Img" alt="첫번째 플레이어 캐릭터"/>
+              <img src="img/character/mario.png" class="ready-player-img" id="p1Img" alt="P1 Character"/>
             </div>
             <div class="custom-character-dropdown" id="p1Dropdown"></div>
           </div>
           <!-- 중앙(방 정보+버튼) -->
           <div class="ready-center-col">
             <div class="ready-room-name" id="roomNameDisplay">(방 이름이 여기에 표시됩니다)</div>
-            <button class="ready-action-btn" id="readyBtn" disabled>준비완료</button>
-            <button class="ready-action-btn leave" id="leaveBtn" disabled>방 나가기</button>
+            <button class="ready-action-btn" id="readyBtn" disabled>Ready!</button>
+            <button class="ready-action-btn leave" id="leaveBtn" disabled>Exit</button>
           </div>
           <!-- P2 -->
           <div class="ready-player-col">
@@ -107,7 +106,7 @@
               P2: <span id="p2Name"></span> (<span class="ready-x" id="p2Status">❌</span>)
             </div>
             <div class="ready-player-img-box">
-              <img src="img/character/mario.png" class="ready-player-img" id="p2Img" alt="두번째 플레이어 캐릭터"/>
+              <img src="img/character/mario.png" class="ready-player-img" id="p2Img" alt="P2 Character"/>
             </div>
             <div class="custom-character-dropdown" id="p2Dropdown"></div>
           </div>
@@ -130,7 +129,7 @@
         <!-- 게임 화면(숨김) 및 캔버스 -->
         <div id="gameScreen" style="display:none;">
           <canvas id="pongCanvas"></canvas>
-          <button class="ready-action-btn leave" id="exitGameBtn" style="margin-top:18px;">게임 나가기</button>
+          <button class="ready-action-btn leave" id="exitGameBtn" style="margin-top:18px;">Exit</button>
         </div>
 
         <!-- 블라인드 이펙트(킵노피오 스킬) -->
@@ -143,7 +142,7 @@
           <div id="resultBox">
             <h2 id="resultTitle"></h2>
             <p id="resultScore"></p>
-            <button id="toLobbyBtnModal">로비로 돌아가기</button>
+            <button id="toLobbyBtnModal">Lobby</button>
           </div>
         </div>
       </div>
@@ -213,7 +212,7 @@
         document.getElementById('p1Img').src = characterMap[p1.character||'Mario'];
         const p1Dropdown = document.getElementById('p1Dropdown'); p1Dropdown.innerHTML = '';
         if (p1.id === socket.id) p1Dropdown.appendChild(createCharacterDropdown(1,p1.character));
-        else p1Dropdown.textContent = p1.character||'미선택';
+        else p1Dropdown.textContent = p1.character||'Choose Character';
       }
       if(p2) {
         document.getElementById('p2Name').textContent = p2.userName || '';
@@ -221,17 +220,13 @@
         document.getElementById('p2Img').src = characterMap[p2.character||'Mario'];
         const p2Dropdown = document.getElementById('p2Dropdown'); p2Dropdown.innerHTML = '';
         if (p2.id === socket.id) p2Dropdown.appendChild(createCharacterDropdown(2,p2.character));
-        else p2Dropdown.textContent = p2.character||'미선택';
+        else p2Dropdown.textContent = p2.character||'Choose Character';
       }
-      document.getElementById('roomTitle').textContent = "Pong PvP 준비 화면";
-      document.getElementById('roomNameDisplay').textContent = currentRoom||'(방 이름)';
+      document.getElementById('roomTitle').textContent = "Pong PvP";
+      document.getElementById('roomNameDisplay').textContent = currentRoom||'(Enter Room Name)';
     });
 
     // --- 버튼 이벤트 ---
-    document.getElementById('createBtn').onclick = function() {
-      const value = document.getElementById('roomInput').value.trim();
-      joinRoom(value);
-    };
     document.getElementById('joinBtn').onclick = function() {
       const value = document.getElementById('roomInput').value.trim();
       joinRoom(value);
