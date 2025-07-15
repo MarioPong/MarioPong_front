@@ -3,161 +3,123 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Pong PvP (가로 전체화면, 결과창, 스킬/캐릭터)</title>
+  <title>Game Selection</title>
+  <link rel="stylesheet" href="css/style_gameSelect.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.js" crossorigin="anonymous"></script>
-  <style>
-    html,
-    body {
-      width: 100vw;
-      height: 100vh;
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background: #222;
-      color: #fff;
-      font-family: sans-serif;
+  <script>
+    let Ownedcharacters = JSON.parse(localStorage.getItem('characters') || '["Mario"]');
+    const owned = Ownedcharacters;
+    function startGame(mode) {
+      if (mode === 'single') {
+        window.location.href = 'marioPong.html';
+      }
     }
-
-    #lobbyScreen,
-    #gameScreen {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: #222;
+    function showMultiModal() {
+      document.getElementById('multiModal').style.display = 'flex';
+      setTimeout(initCustomDropdowns, 0);
+      var card = document.querySelector('.game-select-card');
+      if (card) card.style.display = 'none';
     }
-
-    #gameScreen {
-      display: none;
+    function closeMultiModal() {
+      document.getElementById('multiModal').style.display = 'none';
+      var card = document.querySelector('.game-select-card');
+      if (card) card.style.display = '';
     }
-
-    #status {
-      margin-top: 20px;
-      font-size: 1.2em;
-      color: #3fcf3f;
+    function goBack() {
+      window.location.href = 'main.html';
     }
-
-    #error {
-      color: #ff5555;
-    }
-
-    .row {
-      margin-bottom: 10px;
-    }
-
-    button {
-      margin-left: 5px;
-    }
-
-    #pongCanvas {
-      display: block;
-      background: #000;
-      border: 2px solid #fff;
-      width: 100vw;
-      height: 100vh;
-      max-width: 100vw;
-      max-height: 100vh;
-      touch-action: none;
-    }
-
-    #resultModal {
-      display: none;
-      position: fixed;
-      left: 0;
-      top: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0, 0, 0, 0.8);
-      z-index: 100;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-    }
-
-    #resultBox {
-      background: #fff;
-      color: #222;
-      border-radius: 12px;
-      padding: 40px 60px;
-      text-align: center;
-      min-width: 280px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    }
-
-    #resultBox h2 {
-      margin-bottom: 16px;
-    }
-
-    #resultBox p {
-      font-size: 1.2em;
-    }
-
-    #toLobbyBtn {
-      margin-top: 24px;
-      font-size: 1.1em;
-      padding: 10px 24px;
-      border-radius: 6px;
-      border: none;
-      background: #3fcf3f;
-      color: #fff;
-      cursor: pointer;
-    }
-  </style>
+  </script>
 </head>
 
 <body>
-  <!-- 준비/매칭 화면 -->
-  <div id="lobbyScreen">
-    <h2>Pong PvP 준비 화면</h2>
-    <div class="row">
-      <label>방 이름: <input id="roomInput" placeholder="방 이름 입력"></label>
-      <button id="createBtn">방 만들기</button>
-      <button id="joinBtn">방 참가하기</button>
-      <button id="leaveBtn" disabled>방 나가기</button>
-      <button id="readyBtn" disabled>준비완료</button>
-    </div>
-    <div id="roomInfoBox" style="margin-bottom:16px; font-size:1.1em;"></div>
-    <div id="status"></div>
-    <div id="error"></div>
-  </div>
-
-  <!-- 게임 화면 -->
-  <div id="gameScreen">
-    <canvas id="pongCanvas"></canvas>
-    <button id="exitGameBtn" style="position:absolute;top:24px;right:40px;z-index:10;">게임 나가기</button>
-    <div id="skillBarContainer"
-      style="position:absolute;top:16px;left:50%;transform:translateX(-50%);width:240px;height:24px;z-index:20;">
-      <div id="skillBarBg" style="width:100%;height:100%;background:#444;border-radius:12px;">
-        <div id="skillBar" style="width:0%;height:100%;background:#3fcf3f;border-radius:12px;transition:width 0.2s;">
+  <div class="game-select-bg">
+    <div class="game-select-card">
+      <div class="game-select-header">
+        <button class="back-btn" onclick="goBack()">Back</button>
+        <span class="game-select-title">Select Game Mode</span>
+      </div>
+      <div class="game-mode-selection">
+        <div class="mode-buttons">
+          <button class="mode-btn" onclick="startGame('single')">Single Player</button>
+          <button class="mode-btn" onclick="showMultiModal()">Multi Player</button>
         </div>
       </div>
-      <div id="skillLabel"
-        style="position:absolute;top:0;left:0;width:100%;height:100%;text-align:center;line-height:24px;color:#fff;font-size:1.1em;font-weight:bold;">
-        스킬 쿨타임</div>
     </div>
-  </div>
+    <div class="multi-modal-bg" id="multiModal"
+      style="display:none; flex-direction:column; justify-content:center; align-items:center;">
+      <div class="multi-modal-card ready-modal">
+        <button class="ready-close-btn" id="readyCloseBtn" onclick="closeMultiModal()">×</button>
+        <div class="ready-header">Ready</div>
+        <div class="ready-room-row">
+          <span class="ready-room-label">Enter:</span>
+          <input id="roomInput" class="ready-room-input" type="text" placeholder="Enter Room" />
+          <button id="makeJoinBtn" class="ready-room-btn">Make/Join</button>
+        </div>
+        <div class="ready-main-row">
+          <div class="ready-player-col">
+            <div class="ready-player-label"><span id="player1Name">P1</span>(<span class="ready-check"
+                id="player1Status">❌</span>)</div>
+            <div class="ready-player-img-box">
+              <img src="img/character/mario.png" class="ready-player-img" alt="Mario" />
+            </div>
+            <div class="custom-character-dropdown" data-player="1"></div>
+          </div>
+          <div class="ready-center-col">
+            <div class="ready-room-name" id="roomName">(Room name)</div>
+            <button class="ready-action-btn" id="readyBtnCenter">Ready</button>
+            <button class="ready-action-btn leave" id="leaveBtnCenter">Leave</button>
+          </div>
+          <div class="ready-player-col">
+            <div class="ready-player-label"><span id="player2Name">P2</span>(<span class="ready-x"
+                id="player2Status">❌</span>)</div>
+            <div class="ready-player-img-box">
+              <img src="img/character/mario.png" class="ready-player-img" alt="Mario" />
+            </div>
+            <div class="custom-character-dropdown" data-player="2"></div>
+          </div>
+        </div>
+        <div id="roomInfoBox" style="margin-bottom:10px; font-size:1.1em;"></div>
+        <div id="status" style="min-height:24px;"></div>
+        <div id="error" style="color:#e04d45; text-align:center; margin-top:24px; font-size:1.1em;"></div>
 
-  <!-- 결과 모달 -->
-  <div id="resultModal">
-    <div id="resultBox">
-      <h2 id="resultTitle"></h2>
-      <p id="resultScore"></p>
-      <button id="toLobbyBtn">로비로 돌아가기</button>
+        <!-- 게임 화면 -->
+        <div id="gameScreen"
+          style="display:none; width:100%; justify-content:center; align-items:center; flex-direction:column;">
+          <canvas id="pongCanvas"
+            style="background:#000; border:2px solid #fff; width:100%; max-width:600px; height:400px; max-height:60vh;"></canvas>
+          <button id="exitGameBtn" class="ready-action-btn leave" style="margin-top:16px;">게임 나가기</button>
+          <div id="skillBarContainer" style="margin-top:12px; width:240px; height:24px;">
+            <div id="skillBarBg" style="width:100%;height:100%;background:#444;border-radius:12px;">
+              <div id="skillBar"
+                style="width:0%;height:100%;background:#3fcf3f;border-radius:12px;transition:width 0.2s;"></div>
+            </div>
+            <div id="skillLabel"
+              style="position:absolute;top:0;left:0;width:100%;height:100%;text-align:center;line-height:24px;color:#fff;font-size:1.1em;font-weight:bold;">
+              스킬 쿨타임</div>
+          </div>
+        </div>
+
+        <!-- 결과 모달 -->
+        <div id="resultModal" class="multi-modal-card"
+          style="display:none; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); background:#fff; color:#222; border-radius:12px; padding:40px 60px; text-align:center; min-width:280px; box-shadow:0 8px 32px rgba(0,0,0,0.4); z-index:1100;">
+          <div id="resultBox">
+            <h2 id="resultTitle"></h2>
+            <p id="resultScore"></p>
+            <button id="toLobbyBtn" class="ready-action-btn">로비로 돌아가기</button>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-
-  <div id="blindOverlay"
+    <div id="blindOverlay"
       style="display:none; position:absolute; top:0; left:0; width:100vw; height:100vh; z-index:1000; background:rgba(0,0,0,0.7); justify-content:center; align-items:center;">
-    <img src="./img/item/blooper.png" style="max-width:80vw; max-height:80vh; opacity:0.95;">
+      <img src="./img/item/blooper.png" style="max-width:80vw; max-height:80vh; opacity:0.95;">
+    </div>
   </div>
-
-
   <script>
+    // function goBack() {
+    //   window.location.href = 'main.html';
+    // }
+
     // ====== 설정 ======
     const socket = io('https://mariopong-back-4cre.onrender.com/pong');
     let joined = false;
@@ -211,23 +173,28 @@
     // ====== 방 입장/생성 ======
     function joinRoom(roomName) {
       if (!roomName) {
-        errorDiv.innerText = '방 이름을 입력하세요.';
+        errorDiv.innerText = 'Please enter the room name.';
         return;
       }
       socket.emit('joinRoom', roomName, userName);
       errorDiv.innerText = '';
       currentRoom = roomName;
     }
-    document.getElementById('createBtn').onclick = () => {
-      joinRoom(document.getElementById('roomInput').value.trim());
-    };
-    document.getElementById('joinBtn').onclick = () => {
-      joinRoom(document.getElementById('roomInput').value.trim());
+    document.getElementById('makeJoinBtn').onclick = () => {
+      const roomName = document.getElementById('roomInput').value.trim();
+      if (!roomName) {
+        errorDiv.innerText = 'Please enter the room name.';
+        return;
+      }
+      joinRoom(roomName);
+      // (Room name) 자리에 입력한 방 이름 표시
+      const roomNameDiv = document.getElementById('roomName');
+      if (roomNameDiv) roomNameDiv.textContent = roomName;
     };
     leaveBtn.onclick = () => {
       if (joined && currentRoom) {
         socket.emit('leaveRoom', currentRoom);
-        statusDiv.innerText = '방에서 나왔습니다.';
+        statusDiv.innerText = 'You left the room.';
         readyBtn.disabled = true;
         leaveBtn.disabled = true;
         joined = false;
@@ -238,7 +205,7 @@
     };
     readyBtn.onclick = () => {
       socket.emit('ready', myCharacter);
-      statusDiv.innerText = '준비완료! 상대방을 기다리는 중...';
+      statusDiv.innerText = 'Ready! Waiting for...';
       readyBtn.disabled = true;
     };
     exitGameBtn.onclick = () => {
@@ -264,7 +231,7 @@
     // ====== 화면 전환 ======
     function showLobby() {
       gameScreen.style.display = 'none';
-      lobbyScreen.style.display = 'flex';
+      // lobbyScreen.style.display = 'flex'; // This line is removed as per new HTML structure
       readyBtn.disabled = false;
       leaveBtn.disabled = false;
       statusDiv.innerText = '';
@@ -275,7 +242,7 @@
       roomInfoBox.style.display = 'block';
     }
     function showGame() {
-      lobbyScreen.style.display = 'none';
+      // lobbyScreen.style.display = 'none'; // This line is removed as per new HTML structure
       gameScreen.style.display = 'flex';
       gameActive = true;
       resizeCanvas();
@@ -284,8 +251,8 @@
 
     // ====== 결과 모달 ======
     function showResultModal(winner, score) {
-      resultTitle.innerText = (myPaddleIndex === winner) ? "승리!" : "패배!";
-      resultScore.innerText = `최종 점수: ${score[0]} : ${score[1]}`;
+      resultTitle.innerText = (myPaddleIndex === winner) ? "Win!" : "Loose!";
+      resultScore.innerText = `Score: ${score[0]} : ${score[1]}`;
       resultModal.style.display = 'flex';
     }
     function hideResultModal() {
@@ -300,17 +267,17 @@
       errorDiv.innerText = data.message;
     });
     socket.on('enteredRoom', (index) => {
-      statusDiv.innerText = '방에 입장했습니다. 준비 버튼을 눌러주세요!';
+      statusDiv.innerText = 'You have entered the room. Please push the ready button.';
       readyBtn.disabled = false;
       leaveBtn.disabled = false;
       joined = true;
       playerIndex = index;
     });
     socket.on('connect', () => {
-      statusDiv.innerText = '서버에 연결됨';
+      statusDiv.innerText = 'Server connected';
     });
     socket.on('disconnect', () => {
-      statusDiv.innerText = '서버 연결 끊김';
+      statusDiv.innerText = 'Server disconnected';
       readyBtn.disabled = true;
       leaveBtn.disabled = true;
       joined = false;
@@ -318,11 +285,11 @@
       showLobby();
     });
     socket.on('connect_error', (err) => {
-      errorDiv.innerText = '연결 오류: ' + err.message;
+      errorDiv.innerText = 'Connection error: ' + err.message;
     });
     socket.on('waiting', (data) => {
       if (socket.id === data) {
-        statusDiv.innerText = '준비완료! 상대방을 기다리는 중...';
+        statusDiv.innerText = 'Ready! Waiting for...';
       }
     });
     socket.on('startGame', () => {
@@ -352,7 +319,7 @@
         roomInfoBox.innerHTML = '';
         return;
       }
-      let html = `<strong>방 이름: ${currentRoom}</strong><br>`;
+      let html = `<strong>Room: ${currentRoom}</strong><br>`;
       players.forEach((p, i) => {
         // 내 소켓 ID와 비교해 내 영역에만 select 표시
         if (p.id === socket.id) {
@@ -361,7 +328,7 @@
             ${characters.map(ch => `<option value="${ch}" ${p.character === ch ? 'selected' : ''}>${ch}</option>`).join('')}
           </select><br>`;
         } else {
-          html += `P${i + 1}: ${p.userName} (${p.ready ? '✅' : '❌'}) - <span>${p.character || '미선택'}</span><br>`;
+          html += `P${i + 1}: ${p.userName} (${p.ready ? '✅' : '❌'}) - <span>${p.character || 'Not selected'}</span><br>`;
         }
       });
       roomInfoBox.innerHTML = html;
@@ -421,7 +388,7 @@
       context.fillStyle = 'white';
       context.fill();
 
-      for (const ball of state.fakeBalls){
+      for (const ball of state.fakeBalls) {
         context.beginPath();
         context.arc(ball.x, ball.y, Math.min(cw, ch) * 0.02, 0, 2 * Math.PI, false);
         context.fill();
