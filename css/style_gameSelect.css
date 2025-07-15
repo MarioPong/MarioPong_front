@@ -572,12 +572,12 @@ html {
   color: #2f2421;
 }
 
-.ready-action-btn.leave {
+.ready-action-btn-leave {
   background: #e04d45;
   color: #fff;
 }
 
-.ready-action-btn.leave:hover {
+.ready-action-btn-leave:hover {
   background: #f1cf53;
   color: #e04d45;
 }
