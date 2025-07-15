@@ -134,12 +134,11 @@ html {
 .character-footer.owned {
   background: #c6f7b2;
   color: #1a4d1a;
-  font-weight: bold;
 }
 
 .owned-label {
   color: #1a4d1a;
-  font-size: 0.9rem;
+  font-size: 1.5rem;
   font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
 }
 
