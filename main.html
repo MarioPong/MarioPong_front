@@ -51,6 +51,44 @@
       window.location.href = 'settings.html';
     }
     function logOut(event) {
+
+      console.log("updating user info");
+      let userId = localStorage.getItem('userId');
+      let gold = localStorage.getItem('gold');
+      let score = localStorage.getItem('score');
+      let characters = JSON.parse(localStorage.getItem('characters') || '[]');
+      let records = JSON.parse(localStorage.getItem('records') || '[]');
+      let wins = localStorage.getItem('wins');
+      let losses = localStorage.getItem('losses');
+
+      fetch('https://mariopong-back-4cre.onrender.com/api/user/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          id: userId,
+          gold: gold,
+          score: score,
+          character_own: characters,
+          records: records,
+          wins: wins,
+          losses: losses
+        }),
+        credentials: 'include'
+      })
+        .then(res => {
+          console.log('status:', res.status);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.json();
+        })
+        .then(result => {
+          console.log(result);
+        })
+        .catch(err => {
+          console.error('fetch error:', err);
+        });
+
       event.preventDefault();
       fetch('https://mariopong-back-4cre.onrender.com/api/user/logout', {
         method: 'GET',
