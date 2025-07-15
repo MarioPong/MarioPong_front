@@ -117,9 +117,9 @@
         <div id="roomInfoBox" style="display:none;"></div>
         
         <!-- 스킬 쿨타임 바 -->
-        <div id="skillBarContainer" style="margin:30px auto 0 auto; width:320px;">
+        <div id="skillBarContainer" style="margin:30px auto 0 auto; width:320px;display:none;">
           <div id="skillBarBg" style="width:100%;height:26px;background:#444;border-radius:12px;">
-            <div id="skillBar" style="width:0%;height:100%;background:#3fcf3f;border-radius:12px;transition:width 0.2s;display:none;"></div>
+            <div id="skillBar" style="width:0%;height:100%;background:#3fcf3f;border-radius:12px;transition:width 0.2s;"></div>
           </div>
           <div id="skillLabel" style="width:100%;text-align:center;line-height:26px;color:#2f2421;font-size:1.1em;font-weight:bold;font-family:inherit;">
             Skill Cooldown
@@ -276,13 +276,13 @@
     socket.on('startGame', () => {
       document.querySelector('.ready-main-row').style.display='none';
       document.getElementById('gameScreen').style.display='block';
-      document.getElementById('skillBar').style.display = 'block';
+      document.getElementById('skillBarContainer').style.display = 'block';
       gameActive = true; lastSkillTime = Date.now()-skillCooldown*1000;
       document.getElementById('status').innerText = '';
     });
     socket.on('gameOver', (data) => {
       gameActive = false; showResultModal(data.winner, data.score);
-      document.getElementById('skillBar').style.display = 'none';
+      document.getElementById('skillBarContainer').style.display = 'none';
     });
     socket.on('disconnect', () => {
       document.getElementById('status').innerText = '서버 연결 끊김';
