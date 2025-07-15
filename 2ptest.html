@@ -107,7 +107,7 @@
         <div class="ready-room-row">
           <span class="ready-room-label">Enter:</span>
           <input id="roomInput" class="ready-room-input" type="text" placeholder="Enter Room" />
-          <button class="ready-room-btn" id="joinBtn" onclick="makeOrJoinRoom()">Make/Join</button>
+          <button class="ready-room-btn" id="joinBtn">Make/Join</button>
         </div>
 
         <!-- 플레이어 준비창 -->
@@ -254,7 +254,7 @@
         if (p2.id === socket.id) p2Dropdown.appendChild(createCharacterDropdown(2, p2.character));
         else p2Dropdown.textContent = p2.character || 'Choose Character';
       }
-      document.getElementById('roomTitle').textContent = "Pong PvP";
+      document.getElementById('roomTitle').textContent = "Ready";
       document.getElementById('roomNameDisplay').textContent = currentRoom || '(Enter Room Name)';
     });
 
