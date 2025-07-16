@@ -71,11 +71,8 @@
       window.location.href = 'settings.html';
     }
     async function logOut(event) {
-      event.preventDefault(); // 기본 동작 중단
+      event.preventDefault();
 
-      console.log("updating user info");
-
-      // 사용자 정보 가져오기
       let userId = localStorage.getItem('userId');
       let gold = Number(localStorage.getItem('gold'));
       let score = Number(localStorage.getItem('score'));
@@ -84,40 +81,31 @@
       let wins = Number(localStorage.getItem('wins'));
       let losses = Number(localStorage.getItem('losses'));
 
-      // records 유효성
       if (!Array.isArray(records)) records = [];
       records = records.map(pair => Array.isArray(pair) ? pair.map(Number) : []);
 
-      console.log(records);
-      console.log(typeof records[0]?.[0]);
-
       try {
-        // 1. 사용자 정보 업데이트 요청
+        // 1. 사용자 정보 업데이트
         const updateRes = await fetch('https://back-nogoogle.onrender.com/api/user/update', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             id: userId,
-            gold: gold,
-            score: score,
+            gold,
+            score,
             character_own: characters,
-            records: records,
-            wins: wins,
-            losses: losses
+            records,
+            wins,
+            losses
           }),
           credentials: 'include'
         });
 
-        console.log('Update status:', updateRes.success);
-
-        if (!updateRes.success) {
-          throw new Error(`update error: HTTP ${updateRes.message}`);
-        }
-
         const updateResult = await updateRes.json();
-        console.log('Update result:', updateResult);
+
+        if (!updateResult.success) {
+          throw new Error(`update error: ${updateResult.message || 'Unknown'}`);
+        }
 
         // 2. 로그아웃 요청
         const logoutRes = await fetch('https://back-nogoogle.onrender.com/api/user/logout', {
@@ -125,23 +113,15 @@
           credentials: 'include'
         });
 
+        if (!logoutRes.ok) {
+          throw new Error(`로그아웃 실패: HTTP ${logoutRes.status}`);
+        }
+
         const logoutResult = await logoutRes.json();
 
         if (logoutResult.success) {
           alert('로그아웃이 완료되었습니다.');
-
-          // 로컬스토리지 비우기
-          localStorage.removeItem('userId');
-          localStorage.removeItem('userName');
-          localStorage.removeItem('gold');
-          localStorage.removeItem('score');
-          localStorage.removeItem('characters');
-          localStorage.removeItem('character_now');
-          localStorage.removeItem('records');
-          localStorage.removeItem('losses');
-          localStorage.removeItem('wins');
-
-          // 로그인 페이지로 이동
+          localStorage.clear(); // 모든 데이터 제거
           window.location.href = 'login.html';
         } else {
           alert('로그아웃에 실패했습니다.');
@@ -153,6 +133,7 @@
         alert('서버 오류 또는 네트워크 오류가 발생했습니다.');
       }
     }
+
 
   </script>
 </body>
