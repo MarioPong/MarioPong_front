@@ -59,12 +59,12 @@ html {
 }
 
 .game-select-card.fullscreen {
+  background: #FFECB2;
   width: 100vw;
   height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #000;
   transition: all 0.3s ease;
 }
 
