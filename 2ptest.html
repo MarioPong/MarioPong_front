@@ -96,18 +96,19 @@
 <body>
   <!-- 전체 배경+카드(모달 스타일) -->
   <div class="game-select-bg">
-    <div class="game-select-card" style="padding:0;">
+    <div class="game-select-card">
       <!-- 헤더 -->
-      <div class="game-select-header" style="margin-bottom:0;">
+      <div class="game-select-header">
+        <button class="back-btn" onclick="goBack()">Back</button>
         <button class="back-btn" id="toLobbyBtn" style="position:absolute;left:30px;top:30px;">Lobby</button>
-        <span class="game-select-title" id="roomTitle" style="padding:36px 0 10px 0;">Ready</span>
+        <span class="game-select-title" id="roomTitle">Ready</span>
       </div>
       <!-- 카드 내부 컨텐츠 -->
       <div class="ready-modal" style="box-shadow:none; border:none; min-width:auto; max-width:none; padding:0;">
         <!-- 방 설정 입력 -->
         <div class="ready-room-row">
           <span class="ready-room-label">Enter:</span>
-          <input id="roomInput" class="ready-room-input" type="text" placeholder="Enter the room name" />
+          <input id="roomInput" class="ready-room-input" type="text" placeholder="Enter room" />
           <button class="ready-room-btn" id="joinBtn">Make/Join</button>
         </div>
 
@@ -184,7 +185,7 @@
     // 디자인 캐릭터와 for2ppl 상태 동기화용 변수
     let socket = io('https://mariopong-back-4cre.onrender.com/pong');
     let joined = false, currentRoom = null, myPaddleIndex = null, gameActive = false;
-    let userName = localStorage.getItem('userName') || '익명';
+    let userName = localStorage.getItem('userName') || 'Unknown';
     let characters = JSON.parse(localStorage.getItem('characters') || '["Mario"]');
     let skillCooldown = 10, lastSkillTime = 0, skillReady = false;
     let myCharacter = localStorage.getItem('character_now') || characters[0];
@@ -241,7 +242,7 @@
         document.getElementById('p1Img').src = characterMap[p1.character || 'Mario'];
         const p1Dropdown = document.getElementById('p1Dropdown'); p1Dropdown.innerHTML = '';
         if (p1.id === socket.id) p1Dropdown.appendChild(createCharacterDropdown(1, p1.character));
-        else p1Dropdown.textContent = p1.character || '미선택';
+        else p1Dropdown.textContent = p1.character || 'Unselected';
       }
       if (p2) {
         document.getElementById('p2Name').textContent = p2.userName || '';
@@ -249,10 +250,10 @@
         document.getElementById('p2Img').src = characterMap[p2.character || 'Mario'];
         const p2Dropdown = document.getElementById('p2Dropdown'); p2Dropdown.innerHTML = '';
         if (p2.id === socket.id) p2Dropdown.appendChild(createCharacterDropdown(2, p2.character));
-        else p2Dropdown.textContent = p2.character || '미선택';
+        else p2Dropdown.textContent = p2.character || 'Unselected';
       }
-      document.getElementById('roomTitle').textContent = "Pong PvP 준비 화면";
-      document.getElementById('roomNameDisplay').textContent = currentRoom || '(방 이름)';
+      document.getElementById('roomTitle').textContent = "Ready";
+      document.getElementById('roomNameDisplay').textContent = currentRoom || '(Room name)';
     });
 
     // --- 버튼 이벤트 ---
@@ -294,7 +295,7 @@
     };
     // --- 상태/게임이동/스킬바 ---
     socket.on('enteredRoom', (index) => {
-      document.getElementById('status').innerText = '방에 입장했습니다. 준비 버튼을 눌러주세요!';
+      document.getElementById('status').innerText = 'You have entered the room. Please press the ready button!';
       document.getElementById('readyBtn').disabled = false;
       document.getElementById('leaveBtn').disabled = false;
       joined = true; myPaddleIndex = index;
@@ -329,7 +330,7 @@
       let percent = Math.min(1, elapsed / skillCooldown);
       document.getElementById('skillBar').style.width = (percent * 100) + '%';
       skillReady = percent >= 1;
-      document.getElementById('skillLabel').innerText = skillReady ? '스킬 사용 가능! (Space)' : `Cooltime: ${Math.ceil(skillCooldown - elapsed)}초`;
+      document.getElementById('skillLabel').innerText = skillReady ? 'Skill available! (Space)' : `Cooltime: ${Math.ceil(skillCooldown - elapsed)}초`;
     }
     setInterval(updateSkillBar, 100);
 
@@ -397,6 +398,10 @@
         lastSkillTime = Date.now(); skillReady = false; updateSkillBar();
       }
     });
+
+    function goBack() {
+      window.location.href = 'main.html';
+    }
   </script>
 </body>
 
