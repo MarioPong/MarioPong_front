@@ -186,7 +186,7 @@
 
   <script>
     // 디자인 캐릭터와 for2ppl 상태 동기화용 변수
-    let socket = io('https://mariopong-back-4cre.onrender.com/pong');
+    let socket = io('https://back-nogoogle.onrender.com/pong');
     let joined = false, currentRoom = null, myPaddleIndex = null, gameActive = false;
     let userName = localStorage.getItem('userName') || 'Unknown';
     let characters = JSON.parse(localStorage.getItem('characters') || '["Mario"]');
