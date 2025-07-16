@@ -311,6 +311,7 @@
       document.getElementById('gameScreen').style.display = 'none';
       document.getElementById('readyBtn').disabled = false;
       document.getElementById('leaveBtn').disabled = false;
+      document.querySelector('.ready-main-row').style.display = 'flex';
     };
     // --- 상태/게임이동/스킬바 ---
     socket.on('enteredRoom', (index) => {
