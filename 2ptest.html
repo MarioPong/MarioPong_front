@@ -192,11 +192,11 @@
     let characters = JSON.parse(localStorage.getItem('characters') || '["Mario"]');
     let skillCooldown = 10, lastSkillTime = 0, skillReady = false;
     let myCharacter = localStorage.getItem('character_now') || characters[0];
-    let gold = localStorage.getItem('gold');
-    let score = localStorage.getItem('score');
+    let gold = Number(localStorage.getItem('gold'));
+    let score = Number(localStorage.getItem('score'));
     let records = JSON.parse(localStorage.getItem('records') || '[]');
-    let wins = localStorage.getItem('wins');
-    let losses = localStorage.getItem('losses');
+    let wins = Number(localStorage.getItem('wins'));
+    let losses = Number(localStorage.getItem('losses'));
 
     // --- 준비/로비 기본 화면 표시 ---
     document.getElementById('gameScreen').style.display = 'none';
