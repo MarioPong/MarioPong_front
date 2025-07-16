@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8">
-  <title>Pong PvP (디자인: gameSelect 기준)</title>
+  <title>Pong PvP</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <!-- 스타일 적용 -->
   <link rel="stylesheet" href="css/style_gameSelect.css">
@@ -13,35 +14,42 @@
   <style>
     /* 특수: canvas와 overlay 보정 */
     #pongCanvas {
-      display: block;
-      background: #000;
-      border: 3px solid #fffbe6;
-      border-radius: 12px;
-      width: 100vw;
-      height: 60vh;
-      max-width: 100vw;
-      max-height: 60vh;
+      aspect-ratio: 4 / 3;
+      width: 90vw;
+      max-width: 800px;
+      background: black;
       margin: 0 auto;
-      box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+      display: block;
+      box-shadow: 0 4px 32px rgba(0, 0, 0, 0.18);
     }
+
     #blindOverlay {
-      display:none;
+      display: none;
       position: fixed;
-      top:0; left:0; width:100vw; height:100vh;
-      z-index:2000; background:rgba(0,0,0,0.7);
-      justify-content:center; align-items:center;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 2000;
+      background: rgba(0, 0, 0, 0.7);
+      justify-content: center;
+      align-items: center;
     }
+
     /* 결과 모달 상속/보정 */
     #resultModal {
       display: none;
       position: fixed;
-      left: 0; top: 0;
-      width: 100vw; height: 100vh;
-      background: rgba(0,0,0,0.7);
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
       z-index: 3000;
       align-items: center;
       justify-content: center;
     }
+
     #resultBox {
       background: #ffe7a3;
       color: #2f2421;
@@ -52,33 +60,52 @@
       box-shadow: 0 10px 36px #0004;
       font-family: 'Press Start 2P', 'DNFBitBitv2', monospace;
     }
-    #resultBox h2 { font-size:2rem; margin-bottom: 16px;}
-    #resultBox p { font-size:1.2em; }
+
+    #resultBox h2 {
+      font-size: 2rem;
+      margin-bottom: 16px;
+    }
+
+    #resultBox p {
+      font-size: 1.2em;
+    }
+
     #toLobbyBtn {
-      margin-top: 28px; background: #e04d45; color: #fff;
-      font-family: inherit; border: none;
-      padding: 14px 28px; border-radius: 8px;
-      font-size: 1.1em; cursor: pointer;
+      margin-top: 28px;
+      background: #e04d45;
+      color: #fff;
+      font-family: inherit;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-size: 1.1em;
+      cursor: pointer;
       transition: background 0.2s;
     }
-    #toLobbyBtn:hover { background: #f1cf53; color: #2f2421; }
+
+    #toLobbyBtn:hover {
+      background: #f1cf53;
+      color: #2f2421;
+    }
   </style>
 </head>
+
 <body>
   <!-- 전체 배경+카드(모달 스타일) -->
   <div class="game-select-bg">
-    <div class="game-select-card" style="padding:0;">
+    <div class="game-select-card">
       <!-- 헤더 -->
-      <div class="game-select-header" style="margin-bottom:0;">
-        <button class="back-btn" id="toLobbyBtn" style="position:absolute;left:30px;top:30px;">로비로</button>
-        <span class="game-select-title" id="roomTitle" style="padding:36px 0 10px 0;">Pong PvP 준비 화면</span>
+      <div class="game-select-header">
+        <button class="back-btn" id="toLobbyBtn" style="position:absolute;left:10px;top:0px;">Lobby</button>
+        <button class="back-btn" onclick="goBack()">Back</button>
+        <span class="game-select-title" id="roomTitle">Ready</span>
       </div>
       <!-- 카드 내부 컨텐츠 -->
       <div class="ready-modal" style="box-shadow:none; border:none; min-width:auto; max-width:none; padding:0;">
         <!-- 방 설정 입력 -->
         <div class="ready-room-row">
-          <span class="ready-room-label">방 이름:</span>
-          <input id="roomInput" class="ready-room-input" type="text" placeholder="방 이름 입력"/>
+          <span class="ready-room-label">Enter:</span>
+          <input id="roomInput" class="ready-room-input" type="text" placeholder="Enter room" />
           <button class="ready-room-btn" id="joinBtn">Make/Join</button>
         </div>
 
@@ -90,15 +117,15 @@
               P1: <span id="p1Name"></span> (<span class="ready-check" id="p1Status">❌</span>)
             </div>
             <div class="ready-player-img-box">
-              <img src="img/character/mario.png" class="ready-player-img" id="p1Img" alt="첫번째 플레이어 캐릭터"/>
+              <img src="img/character/mario.png" class="ready-player-img" id="p1Img" alt="첫번째 플레이어 캐릭터" />
             </div>
             <div class="custom-character-dropdown" id="p1Dropdown"></div>
           </div>
           <!-- 중앙(방 정보+버튼) -->
           <div class="ready-center-col">
-            <div class="ready-room-name" id="roomNameDisplay">(방 이름이 여기에 표시됩니다)</div>
-            <button class="ready-action-btn" id="readyBtn" disabled>준비완료</button>
-            <button class="ready-action-btn leave" id="leaveBtn" disabled>방 나가기</button>
+            <div class="ready-room-name" id="roomNameDisplay">(Room name)</div>
+            <button class="ready-action-btn" id="readyBtn" disabled>Ready</button>
+            <button class="ready-action-btn leave" id="leaveBtn" disabled>Leave</button>
           </div>
           <!-- P2 -->
           <div class="ready-player-col">
@@ -106,22 +133,27 @@
               P2: <span id="p2Name"></span> (<span class="ready-x" id="p2Status">❌</span>)
             </div>
             <div class="ready-player-img-box">
-              <img src="img/character/mario.png" class="ready-player-img" id="p2Img" alt="두번째 플레이어 캐릭터"/>
+              <img src="img/character/mario.png" class="ready-player-img" id="p2Img" alt="두번째 플레이어 캐릭터" />
             </div>
             <div class="custom-character-dropdown" id="p2Dropdown"></div>
           </div>
         </div>
         <!-- 에러/상태 메시지 -->
-        <div id="status" style="margin:18px 0 0 0; color:#20a010; font-size:1.1em;"></div>
-        <div id="error" style="color:#e04d45; font-size:1.1em;"></div>
-        <div id="roomInfoBox" style="display:none;"></div>
-        
+        <div
+          style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; margin-top: 18px;">
+          <div id="status" style="color:#20a010; font-size:1.1em;"></div>
+          <div id="error" style="color:#e04d45; font-size:1.1em;"></div>
+          <div id="roomInfoBox" style="display:none;"></div>
+        </div>
+
         <!-- 스킬 쿨타임 바 -->
         <div id="skillBarContainer" style="margin:30px auto 0 auto; width:320px;display: none;">
           <div id="skillBarBg" style="width:100%;height:26px;background:#444;border-radius:12px;">
-            <div id="skillBar" style="width:0%;height:100%;background:#3fcf3f;border-radius:12px;transition:width 0.2s;"></div>
+            <div id="skillBar"
+              style="width:0%;height:100%;background:#3fcf3f;border-radius:12px;transition:width 0.2s;"></div>
           </div>
-          <div id="skillLabel" style="width:100%;text-align:center;line-height:26px;color:#2f2421;font-size:1.1em;font-weight:bold;font-family:inherit;">
+          <div id="skillLabel"
+            style="width:100%;text-align:center;line-height:26px;color:#2f2421;font-size:1.1em;font-weight:bold;font-family:inherit;">
             스킬 쿨타임
           </div>
         </div>
@@ -129,7 +161,7 @@
         <!-- 게임 화면(숨김) 및 캔버스 -->
         <div id="gameScreen" style="display:none;">
           <canvas id="pongCanvas"></canvas>
-          <button class="ready-action-btn leave" id="exitGameBtn" style="margin-top:18px;">게임 나가기</button>
+          <button class="ready-action-btn leave" id="exitGameBtn" style="margin-top:18px;">Leave</button>
         </div>
 
         <!-- 블라인드 이펙트(킵노피오 스킬) -->
@@ -142,20 +174,18 @@
           <div id="resultBox">
             <h2 id="resultTitle"></h2>
             <p id="resultScore"></p>
-            <button id="toLobbyBtnModal">로비로 돌아가기</button>
+            <button id="toLobbyBtnModal">Return to Lobby</button>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- JS →
-  <!-- for2ppl.html과 동일(폼 컨트롤, 소켓 로직, 드롭다운, 캔버스 등) -->
   <script>
     // 디자인 캐릭터와 for2ppl 상태 동기화용 변수
     let socket = io('https://mariopong-back-4cre.onrender.com/pong');
     let joined = false, currentRoom = null, myPaddleIndex = null, gameActive = false;
-    let userName = localStorage.getItem('userName') || '익명';
+    let userName = localStorage.getItem('userName') || 'Unknown';
     let characters = JSON.parse(localStorage.getItem('characters') || '["Mario"]');
     let skillCooldown = 10, lastSkillTime = 0, skillReady = false;
     let myCharacter = localStorage.getItem('character_now') || characters[0];
@@ -176,7 +206,7 @@
       container.className = 'dropdown-container';
       const currentChar = selectedChar || 'Mario';
       const button = document.createElement('button');
-      button.className = 'dropdown-btn'; 
+      button.className = 'dropdown-btn';
       button.innerHTML = `
         <img src="${characterMap[currentChar]}" class="dropdown-btn-img" />
         <span class="dropdown-btn-name">${currentChar}</span>
@@ -192,13 +222,13 @@
           list.style.display = 'none';
           localStorage.setItem('character_now', charKey);
           socket.emit('selectCharacter', charKey);
-          if(playerIndex===1) document.getElementById('p1Img').src = characterMap[charKey];
-          if(playerIndex===2) document.getElementById('p2Img').src = characterMap[charKey];
+          if (playerIndex === 1) document.getElementById('p1Img').src = characterMap[charKey];
+          if (playerIndex === 2) document.getElementById('p2Img').src = characterMap[charKey];
           myCharacter = charKey;
         };
         list.appendChild(item);
       });
-      button.onclick = (e) => { e.stopPropagation(); list.style.display = list.style.display==='block'?'none':'block'; };
+      button.onclick = (e) => { e.stopPropagation(); list.style.display = list.style.display === 'block' ? 'none' : 'block'; };
       container.appendChild(button); container.appendChild(list);
       return container;
     }
@@ -206,57 +236,58 @@
     // --- 로비 정보 등 UI 업데이트 ---
     socket.on('roomInfo', (players) => {
       const p1 = players[0], p2 = players[1];
-      if(p1) {
+      if (p1) {
         document.getElementById('p1Name').textContent = p1.userName || '';
-        document.getElementById('p1Status').textContent = p1.ready ? '✔️':'❌';
-        document.getElementById('p1Img').src = characterMap[p1.character||'Mario'];
+        document.getElementById('p1Status').textContent = p1.ready ? '✔️' : '❌';
+        document.getElementById('p1Img').src = characterMap[p1.character || 'Mario'];
         const p1Dropdown = document.getElementById('p1Dropdown'); p1Dropdown.innerHTML = '';
-        if (p1.id === socket.id) p1Dropdown.appendChild(createCharacterDropdown(1,p1.character));
-        else p1Dropdown.textContent = p1.character||'미선택';
+        if (p1.id === socket.id) p1Dropdown.appendChild(createCharacterDropdown(1, p1.character));
+        else p1Dropdown.textContent = p1.character || 'Unselected';
       }
-      if(p2) {
+      if (p2) {
         document.getElementById('p2Name').textContent = p2.userName || '';
-        document.getElementById('p2Status').textContent = p2.ready ? '✔️':'❌';
-        document.getElementById('p2Img').src = characterMap[p2.character||'Mario'];
+        document.getElementById('p2Status').textContent = p2.ready ? '✔️' : '❌';
+        document.getElementById('p2Img').src = characterMap[p2.character || 'Mario'];
         const p2Dropdown = document.getElementById('p2Dropdown'); p2Dropdown.innerHTML = '';
-        if (p2.id === socket.id) p2Dropdown.appendChild(createCharacterDropdown(2,p2.character));
-        else p2Dropdown.textContent = p2.character||'미선택';
+        if (p2.id === socket.id) p2Dropdown.appendChild(createCharacterDropdown(2, p2.character));
+        else p2Dropdown.textContent = p2.character || 'Unselected';
       }
-      document.getElementById('roomTitle').textContent = "Pong PvP 준비 화면";
-      document.getElementById('roomNameDisplay').textContent = currentRoom||'(방 이름)';
+      document.getElementById('roomTitle').textContent = "Ready";
+      document.getElementById('roomNameDisplay').textContent = currentRoom || '(Room name)';
     });
 
     // --- 버튼 이벤트 ---
-    document.getElementById('joinBtn').onclick = function() {
+    document.getElementById('joinBtn').onclick = function () {
       const value = document.getElementById('roomInput').value.trim();
       joinRoom(value);
     };
     function joinRoom(room) {
-      if(!room) {
-        document.getElementById('error').innerText = '방 이름을 입력하세요.'; return;
+      if (!room) {
+        document.getElementById('error').innerText = 'Enter the room name.'; return;
       }
       socket.emit('joinRoom', room, userName);
       currentRoom = room;
       document.getElementById('roomNameDisplay').textContent = room;
       document.getElementById('error').innerText = '';
     }
-    document.getElementById('leaveBtn').onclick = function() {
+    document.getElementById('leaveBtn').onclick = function () {
       if (joined && currentRoom) {
         socket.emit('leaveRoom', currentRoom);
         joined = false; currentRoom = null;
-        document.getElementById('status').innerText = '방에서 나왔습니다.';
+        document.getElementById('status').innerText = 'You left the room.';
         document.getElementById('readyBtn').disabled = true;
         document.getElementById('leaveBtn').disabled = true;
+        document.getElementById('skillBarContainer').style.display = 'none';
       }
     };
-    document.getElementById('readyBtn').onclick = function() {
+    document.getElementById('readyBtn').onclick = function () {
       socket.emit('ready', myCharacter);
-      document.getElementById('status').innerText = '준비완료! 상대방을 기다리는 중...';
+      document.getElementById('status').innerText = 'Ready! Waiting for...';
       document.getElementById('readyBtn').disabled = true;
     };
-    document.getElementById('toLobbyBtn').onclick = function() { location.reload(); };
-    document.getElementById('toLobbyBtnModal').onclick = function() { location.reload(); };
-    document.getElementById('exitGameBtn').onclick = function() {
+    document.getElementById('toLobbyBtn').onclick = function () { location.reload(); };
+    document.getElementById('toLobbyBtnModal').onclick = function () { location.reload(); };
+    document.getElementById('exitGameBtn').onclick = function () {
       socket.emit('leaveRoom', currentRoom);
       joined = false; currentRoom = null;
       document.getElementById('gameScreen').style.display = 'none';
@@ -265,32 +296,33 @@
     };
     // --- 상태/게임이동/스킬바 ---
     socket.on('enteredRoom', (index) => {
-      document.getElementById('status').innerText = '방에 입장했습니다. 준비 버튼을 눌러주세요!';
+      document.getElementById('status').innerText = 'Please press the ready button!';
       document.getElementById('readyBtn').disabled = false;
       document.getElementById('leaveBtn').disabled = false;
-      joined=true; myPaddleIndex = index;
+      joined = true; myPaddleIndex = index;
     });
     socket.on('waiting', () => {
-      document.getElementById('status').innerText = '준비완료! 상대방을 기다리는 중...';
+      document.getElementById('status').innerText = 'Ready! Waiting for...';
     });
     socket.on('startGame', () => {
-      document.querySelector('.ready-main-row').style.display='none';
-      document.getElementById('gameScreen').style.display='block';
-      document.getElementById('skillBarContainer').style.display='block';
-      gameActive = true; lastSkillTime = Date.now()-skillCooldown*1000;
+      document.querySelector('.ready-main-row').style.display = 'none';
+      document.getElementById('gameScreen').style.display = 'block';
+      document.getElementById('skillBarContainer').style.display = 'block';
+      gameActive = true; lastSkillTime = Date.now() - skillCooldown * 1000;
       document.getElementById('status').innerText = '';
     });
     socket.on('gameOver', (data) => {
       gameActive = false; showResultModal(data.winner, data.score);
-      document.getElementById('skillBarContainer').style.display='none';
+      document.getElementById('skillBarContainer').style.display = 'none';
     });
     socket.on('disconnect', () => {
-      document.getElementById('status').innerText = '서버 연결 끊김';
-      joined=false; currentRoom=null; gameActive=false;
+      document.getElementById('status').innerText = 'Server disconnected';
+      joined = false; currentRoom = null; gameActive = false;
+      document.getElementById('skillBarContainer').style.display = 'none';
     });
     function showResultModal(winner, score) {
-      document.getElementById('resultTitle').innerText = (myPaddleIndex === winner) ? "승리!" : "패배!";
-      document.getElementById('resultScore').innerText = `최종 점수: ${score[0]} : ${score[1]}`;
+      document.getElementById('resultTitle').innerText = (myPaddleIndex === winner) ? "Win!" : "Loose!";
+      document.getElementById('resultScore').innerText = `Score: ${score[0]} : ${score[1]}`;
       document.getElementById('resultModal').style.display = 'flex';
     }
     // --- 스킬 쿨타임 바 ---
@@ -300,7 +332,7 @@
       let percent = Math.min(1, elapsed / skillCooldown);
       document.getElementById('skillBar').style.width = (percent * 100) + '%';
       skillReady = percent >= 1;
-      document.getElementById('skillLabel').innerText = skillReady ? '스킬 사용 가능! (Space)' : `쿨타임: ${Math.ceil(skillCooldown - elapsed)}초`;
+      document.getElementById('skillLabel').innerText = skillReady ? 'Skill available! (Space)' : `Cooltime: ${Math.ceil(skillCooldown - elapsed)}S`;
     }
     setInterval(updateSkillBar, 100);
 
@@ -312,62 +344,68 @@
     }
     window.addEventListener('resize', resizeCanvas); resizeCanvas();
 
-    socket.on('gameState', (state) => { window.lastGameState=state; renderGame(state); });
+    socket.on('gameState', (state) => { window.lastGameState = state; renderGame(state); });
     function renderGame(state) {
-      context.clearRect(0,0,canvas.width,canvas.height);
-      const cw=canvas.width, ch=canvas.height;
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      const cw = canvas.width, ch = canvas.height;
       const paddleWidth0 = (state.paddleWidth ? state.paddleWidth[0] : 10) / 700 * cw;
       const paddleWidth1 = (state.paddleWidth ? state.paddleWidth[1] : 10) / 700 * cw;
       const paddleHeight0 = (state.paddleHeight ? state.paddleHeight[0] : 75) / 500 * ch;
       const paddleHeight1 = (state.paddleHeight ? state.paddleHeight[1] : 75) / 500 * ch;
-      const paddleY0 = state.paddleY ? state.paddleY[0] / 500 * ch : ch/2-paddleHeight0/2;
-      const paddleY1 = state.paddleY ? state.paddleY[1] / 500 * ch : ch/2-paddleHeight1/2;
-      const paddleX0 = cw*0.03, paddleX1 = cw-paddleWidth1-cw*0.03;
-      context.fillStyle='black'; context.fillRect(0,0,cw,ch);
-      context.beginPath();context.setLineDash([4]);context.moveTo(cw/2,0);context.lineTo(cw/2,ch);context.strokeStyle='grey';context.stroke();
-      context.setLineDash([]);context.fillStyle='white';
-      context.fillRect(paddleX0,paddleY0,paddleWidth0,paddleHeight0);
-      context.fillRect(paddleX1,paddleY1,paddleWidth1,paddleHeight1);
+      const paddleY0 = state.paddleY ? state.paddleY[0] / 500 * ch : ch / 2 - paddleHeight0 / 2;
+      const paddleY1 = state.paddleY ? state.paddleY[1] / 500 * ch : ch / 2 - paddleHeight1 / 2;
+      const paddleX0 = cw * 0.03, paddleX1 = cw - paddleWidth1 - cw * 0.03;
+      /*배경화면 아마 여기*/
+      context.fillStyle = 'black'; context.fillRect(0, 0, cw, ch);
+      context.beginPath(); context.setLineDash([4]); context.moveTo(cw / 2, 0); context.lineTo(cw / 2, ch); context.strokeStyle = 'grey'; context.stroke();
+      context.setLineDash([]); context.fillStyle = 'white';
+      context.fillRect(paddleX0, paddleY0, paddleWidth0, paddleHeight0);
+      context.fillRect(paddleX1, paddleY1, paddleWidth1, paddleHeight1);
       const ballX = (state.ballX / 700) * cw, ballY = (state.ballY / 500) * ch;
-      context.beginPath();context.arc(ballX,ballY,Math.min(cw,ch)*0.02,0,2*Math.PI);context.fillStyle='white';context.fill();
-      for(const ball of state.fakeBalls) {
-        context.beginPath();context.arc(ball.x/700*cw,ball.y/500*ch,Math.min(cw,ch)*0.02,0,2*Math.PI);
-        context.fillStyle='white';context.fill();
+      context.beginPath(); context.arc(ballX, ballY, Math.min(cw, ch) * 0.02, 0, 2 * Math.PI); context.fillStyle = 'white'; context.fill();
+      for (const ball of state.fakeBalls) {
+        context.beginPath(); context.arc(ball.x / 700 * cw, ball.y / 500 * ch, Math.min(cw, ch) * 0.02, 0, 2 * Math.PI);
+        context.fillStyle = 'white'; context.fill();
       }
-      context.font=`${Math.floor(ch*0.08)}px Courier New`;
-      context.fillText(state.score?state.score[0]:0, cw*0.25, ch*0.1);
-      context.fillText(state.score?state.score[1]:0, cw*0.75, ch*0.1);
+      context.font = `${Math.floor(ch * 0.08)}px Courier New`;
+      context.fillText(state.score ? state.score[0] : 0, cw * 0.25, ch * 0.1);
+      context.fillText(state.score ? state.score[1] : 0, cw * 0.75, ch * 0.1);
     }
     canvas.addEventListener('mousemove', (e) => {
-      if (!gameActive || myPaddleIndex===null) return;
-      const rect=canvas.getBoundingClientRect();
+      if (!gameActive || myPaddleIndex === null) return;
+      const rect = canvas.getBoundingClientRect();
       let y = e.clientY - rect.top, ch = canvas.height;
-      const paddleHeight = window.lastGameState?.paddleHeight ? window.lastGameState.paddleHeight[myPaddleIndex]/500*ch : ch*0.15;
+      const paddleHeight = window.lastGameState?.paddleHeight ? window.lastGameState.paddleHeight[myPaddleIndex] / 500 * ch : ch * 0.15;
       y = Math.max(0, Math.min(y, ch - paddleHeight));
       socket.emit('paddleMove', { yPosition: y / ch * 500 });
     });
     canvas.addEventListener('touchmove', (e) => {
-      if (!gameActive || myPaddleIndex===null) return;
-      const rect=canvas.getBoundingClientRect();
+      if (!gameActive || myPaddleIndex === null) return;
+      const rect = canvas.getBoundingClientRect();
       let y = e.touches[0].clientY - rect.top, ch = canvas.height;
-      const paddleHeight = window.lastGameState?.paddleHeight ? window.lastGameState.paddleHeight[myPaddleIndex]/500*ch : ch*0.15;
+      const paddleHeight = window.lastGameState?.paddleHeight ? window.lastGameState.paddleHeight[myPaddleIndex] / 500 * ch : ch * 0.15;
       y = Math.max(0, Math.min(y, ch - paddleHeight));
       socket.emit('paddleMove', { yPosition: y / ch * 500 }); e.preventDefault();
-    }, { passive:false });
+    }, { passive: false });
 
     // --- 블라인드 이펙트 ---
-    socket.on('blindEffect', ({duration}) => {
-      document.getElementById('blindOverlay').style.display='flex';
-      setTimeout(()=>{document.getElementById('blindOverlay').style.display='none';}, duration || 1000);
+    socket.on('blindEffect', ({ duration }) => {
+      document.getElementById('blindOverlay').style.display = 'flex';
+      setTimeout(() => { document.getElementById('blindOverlay').style.display = 'none'; }, duration || 1000);
     });
 
     // 스킬 사용
-    document.addEventListener('keydown',(e)=>{
-      if(e.code==='Space' && skillReady && gameActive){
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' && skillReady && gameActive) {
         socket.emit('useSkill');
-        lastSkillTime = Date.now(); skillReady=false; updateSkillBar();
+        lastSkillTime = Date.now(); skillReady = false; updateSkillBar();
       }
     });
+
+    function goBack() {
+      window.location.href = 'main.html';
+    }
   </script>
 </body>
+
 </html>
