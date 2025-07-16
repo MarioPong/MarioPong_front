@@ -14,7 +14,7 @@
   <style>
     /* 특수: canvas와 overlay 보정 */
     #pongCanvas {
-      /*display: block;
+      display: block;
       margin: 0 auto;
       background: #000;
       border: 3px solid #fffbe6;
@@ -25,15 +25,7 @@
       max-height: 90vh;
       box-shadow: 0 4px 32px rgba(0, 0, 0, 0.18);
       position: relative;
-      z-index: 0;*/
-      display: block;
-      background: #000;
-      border: 2px solid #fff;
-      width: 100vw;
-      height: 100vh;
-      max-width: 100vw;
-      max-height: 100vh;
-      touch-action: none;
+      z-index: 0;
     }
 
     #blindOverlay {
@@ -104,6 +96,7 @@
 </head>
 
 <body>
+  <canvas id="pongCanvas"></canvas>
   <!-- 전체 배경+카드(모달 스타일) -->
   <div class="game-select-bg">
     <div class="game-select-card">
@@ -172,7 +165,7 @@
         </div>
 
         <!-- 게임 화면(숨김) 및 캔버스 -->
-        <div id="gameScreen">
+        <div id="gameScreen" style="display:none;">
           <canvas id="pongCanvas"></canvas>
           <button class="ready-action-btn leave" id="exitGameBtn" style="margin-top:18px;">Leave</button>
         </div>
@@ -196,17 +189,12 @@
 
   <script>
     // 디자인 캐릭터와 for2ppl 상태 동기화용 변수
-    let socket = io('https://back-nogoogle.onrender.com/pong');
+    let socket = io('https://mariopong-back-4cre.onrender.com/pong');
     let joined = false, currentRoom = null, myPaddleIndex = null, gameActive = false;
     let userName = localStorage.getItem('userName') || 'Unknown';
     let characters = JSON.parse(localStorage.getItem('characters') || '["Mario"]');
     let skillCooldown = 10, lastSkillTime = 0, skillReady = false;
     let myCharacter = localStorage.getItem('character_now') || characters[0];
-    let gold = localStorage.getItem('gold');
-    let score = localStorage.getItem('score');
-    let records = JSON.parse(localStorage.getItem('records') || '[]');
-    let wins = localStorage.getItem('wins');
-    let losses = localStorage.getItem('losses');
 
     // --- 준비/로비 기본 화면 표시 ---
     document.getElementById('gameScreen').style.display = 'none';
@@ -332,34 +320,6 @@
     socket.on('gameOver', (data) => {
       gameActive = false; showResultModal(data.winner, data.score);
       document.getElementById('skillBarContainer').style.display = 'none';
-      if (myPaddleIndex === data.winner) { // win
-        gold += 80;
-        score += 20;
-        wins += 1;
-        if (data.score[0] > data.score[1]) {
-          records.push(data.score);
-        } else {
-          records.push([data.score[1], data.score[0]]);
-        }
-
-        localStorage.setItem('gold', gold);
-        localStorage.setItem('score', score);
-        localStorage.setItem('records', JSON.stringify(records));
-        localStorage.setItem('wins', wins);
-      } else { // lose
-        if (score > 10) score -= 10;
-        else score = 0;
-        losses += 1;
-        if (data.score[1] > data.score[0]) {
-          records.push(data.score);
-        } else {
-          records.push([data.score[1], data.score[0]]);
-        }
-
-        localStorage.setItem('score', score);
-        localStorage.setItem('records', JSON.stringify(records));
-        localStorage.setItem('losses', losses);
-      }
     });
     socket.on('disconnect', () => {
       document.getElementById('status').innerText = 'Server disconnected';
