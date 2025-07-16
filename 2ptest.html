@@ -15,17 +15,15 @@
     /* 특수: canvas와 overlay 보정 */
     #pongCanvas {
       display: block;
-      margin: 0 auto;
       background: #000;
-      border: 3px solid #fffbe6;
+      border: 2px solid #fff;
       border-radius: 12px;
       width: 90vw;
-      height: 80vh;
       max-width: 1200px;
-      max-height: 90vh;
+      aspect-ratio: 7 / 5;
+      height: auto;
+      margin: 0 auto;
       box-shadow: 0 4px 32px rgba(0, 0, 0, 0.18);
-      position: relative;
-      z-index: 0;
     }
 
     #blindOverlay {
@@ -195,6 +193,11 @@
     let characters = JSON.parse(localStorage.getItem('characters') || '["Mario"]');
     let skillCooldown = 10, lastSkillTime = 0, skillReady = false;
     let myCharacter = localStorage.getItem('character_now') || characters[0];
+    let gold = Number(localStorage.getItem('gold'));
+    let score = Number(localStorage.getItem('score'));
+    let records = JSON.parse(localStorage.getItem('records') || '[]');
+    let wins = Number(localStorage.getItem('wins'));
+    let losses = Number(localStorage.getItem('losses'));
 
     // --- 준비/로비 기본 화면 표시 ---
     document.getElementById('gameScreen').style.display = 'none';
@@ -348,6 +351,7 @@
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight * 0.58;
     }
+
     window.addEventListener('resize', resizeCanvas); resizeCanvas();
 
     socket.on('gameState', (state) => { window.lastGameState = state; renderGame(state); });
