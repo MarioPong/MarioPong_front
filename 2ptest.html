@@ -196,7 +196,7 @@
 
   <script>
     // 디자인 캐릭터와 for2ppl 상태 동기화용 변수
-    let socket = io('https://mariopong-back-4cre.onrender.com/pong');
+    let socket = io('https://back-nogoogle.onrender.com/pong');
     let joined = false, currentRoom = null, myPaddleIndex = null, gameActive = false;
     let userName = localStorage.getItem('userName') || 'Unknown';
     let characters = JSON.parse(localStorage.getItem('characters') || '["Mario"]');
@@ -311,7 +311,6 @@
       document.getElementById('gameScreen').style.display = 'none';
       document.getElementById('readyBtn').disabled = false;
       document.getElementById('leaveBtn').disabled = false;
-      document.querySelector('.ready-main-row').style.display = 'flex';
     };
     // --- 상태/게임이동/스킬바 ---
     socket.on('enteredRoom', (index) => {
@@ -337,7 +336,7 @@
         gold += 80;
         score += 20;
         wins += 1;
-        if (data.score[0]>data.score[1]){
+        if (data.score[0] > data.score[1]) {
           records.push(data.score);
         } else {
           records.push([data.score[1], data.score[0]]);
@@ -348,10 +347,10 @@
         localStorage.setItem('records', records);
         localStorage.setItem('wins', wins);
       } else { // lose
-        if(score>10) score -= 10;
-        else score=0;
+        if (score > 10) score -= 10;
+        else score = 0;
         losses += 1;
-        if (data.score[1]>data.score[0]){
+        if (data.score[1] > data.score[0]) {
           records.push(data.score);
         } else {
           records.push([data.score[1], data.score[0]]);
