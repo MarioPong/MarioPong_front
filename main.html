@@ -30,27 +30,6 @@
     <button class="main-menu-logout" onclick="logOut(event)">logout</button>
   </div>
   <script>
-    // window.addEventListener('DOMContentLoaded', () => {
-    //   fetch('https://mariopong-back-4cre.onrender.com/api/user/auth', {
-    //     method: 'GET',
-    //     credentials: 'include'
-    //   })
-    //     .then(res => res.json())
-    //     .then(user => {
-    //       if (user.isAuth) {
-    //         localStorage.setItem('userId', user.id);
-    //         localStorage.setItem('userName', user.name);
-    //         localStorage.setItem('gold', user.gold);
-    //         localStorage.setItem('score', user.score);
-    //         localStorage.setItem('characters', JSON.stringify(user.character_own));
-    //         localStorage.setItem('records', JSON.stringify(user.records));
-    //         localStorage.setItem('wins', user.wins);
-    //         localStorage.setItem('losses', user.losses);
-    //       } else {
-    //         window.location.href = 'login.html';
-    //       }
-    //     });
-    // });
 
     let userName = localStorage.getItem('userName');
 
@@ -76,12 +55,18 @@
 
       console.log("updating user info");
       let userId = localStorage.getItem('userId');
-      let gold = localStorage.getItem('gold');
-      let score = localStorage.getItem('score');
+      let gold = Number(localStorage.getItem('gold'));
+      let score = Number(localStorage.getItem('score'));
       let characters = JSON.parse(localStorage.getItem('characters') || '[]');
       let records = JSON.parse(localStorage.getItem('records') || '[]');
-      let wins = localStorage.getItem('wins');
-      let losses = localStorage.getItem('losses');
+      let wins = Number(localStorage.getItem('wins'));
+      let losses = Number(localStorage.getItem('losses'));
+
+      if (!Array.isArray(records)) records = [];
+      records = records.map(pair => Array.isArray(pair) ? pair.map(Number) : []);
+
+      console.log(records);
+      console.log(typeof records[0][0]);
 
       fetch('https://back-nogoogle.onrender.com/api/user/update', {
         method: 'POST',

@@ -342,7 +342,7 @@
     });
     socket.on('gameOver', (data) => {
       gameActive = false; showResultModal(data.winner, data.score);
-      if (myPaddleIndex === winner) { //win
+      if (myPaddleIndex === data.winner) { //win
         gold += 80;
         score += 20;
         if (data.score[0] > data.score[1]) {
@@ -374,11 +374,6 @@
         localStorage.setItem('records', JSON.stringify(records));
         localStorage.setItem('losses', losses);
       }
-      console.log(gold);
-      console.log(score);
-      console.log(records);
-      console.log(wins);
-      console.log(losses);
       document.getElementById('skillBarContainer').style.display = 'none';
     });
     socket.on('disconnect', () => {
