@@ -62,6 +62,12 @@
       let wins = Number(localStorage.getItem('wins'));
       let losses = Number(localStorage.getItem('losses'));
 
+      if (!Array.isArray(records)) records = [];
+      records = records.map(pair => Array.isArray(pair) ? pair.map(Number) : []);
+
+      console.log(records);
+      console.log(typeof records[0][0]);
+
       fetch('https://back-nogoogle.onrender.com/api/user/update', {
         method: 'POST',
         headers: {
