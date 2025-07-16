@@ -277,6 +277,7 @@
         document.getElementById('status').innerText = 'You left the room.';
         document.getElementById('readyBtn').disabled = true;
         document.getElementById('leaveBtn').disabled = true;
+        document.getElementById('skillBarContainer').style.display = 'none';
       }
     };
     document.getElementById('readyBtn').onclick = function () {
@@ -317,6 +318,7 @@
     socket.on('disconnect', () => {
       document.getElementById('status').innerText = 'Server disconnected';
       joined = false; currentRoom = null; gameActive = false;
+      document.getElementById('skillBarContainer').style.display = 'none';
     });
     function showResultModal(winner, score) {
       document.getElementById('resultTitle').innerText = (myPaddleIndex === winner) ? "Win!" : "Loose!";
