@@ -51,9 +51,21 @@
           <span class="profile-value-display" id="profileUserRank"></span>
 
           <div class="profile-btn-row">
-            <button class="profile-btn main">Top10</button>
+            <button class="profile-btn main" id="top10Btn">Top10</button>
             <button class="profile-btn">Records</button>
           </div>
+        </div>
+      </div>
+      <!-- Top10 모달 -->
+      <div id="top10Modal"
+        style="display:none; position:fixed; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); z-index:9999; justify-content:center; align-items:center;">
+        <div
+          style="background:#fffbe6; border-radius:18px; padding:40px 60px; min-width:320px; box-shadow:0 8px 32px #0006; text-align:center; font-family:'Press Start 2P', 'DNFBitBitv2', monospace;">
+          <h2 style="font-size:2rem; margin-bottom:18px; color:#2f2421;">Top 10 & Records</h2>
+          <div id="top10Score" style="font-size:1.2em; margin-bottom:18px;"></div>
+          <div id="top10Records" style="font-size:1em; color:#444;"></div>
+          <button onclick="document.getElementById('top10Modal').style.display='none'"
+            style="margin-top:24px; background:#e04d45; color:#fff; border:none; border-radius:8px; padding:12px 28px; font-size:1.1em; cursor:pointer;">Close</button>
         </div>
       </div>
     </div>
@@ -81,6 +93,26 @@
 
     function goBack() {
       window.location.href = 'main.html';
+    }
+
+    // Top10 버튼 기능
+    document.getElementById('top10Btn').onclick = function () {
+      const score = localStorage.getItem('score') || 0;
+      const records = JSON.parse(localStorage.getItem('records') || '[]');
+      let html = `<b>Score:</b> ${score}`;
+      document.getElementById('top10Score').innerHTML = html;
+      let recHtml = '';
+      if (records.length === 0) {
+        recHtml = 'No records yet.';
+      } else {
+        recHtml = '<b>Records:</b><br><ol style="text-align:left;">';
+        records.slice(-10).reverse().forEach((rec, i) => {
+          recHtml += `<li> ${rec[0]} : ${rec[1]} </li>`;
+        });
+        recHtml += '</ol>';
+      }
+      document.getElementById('top10Records').innerHTML = recHtml;
+      document.getElementById('top10Modal').style.display = 'flex';
     }
 
 

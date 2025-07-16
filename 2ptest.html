@@ -265,16 +265,17 @@
     });
 
     function startGameUI() { // Delete
-      if (container.header) {
-        container.header.className = container.header.className
-          .replace('game-select-header', '')
-          .trim();
+      const container = document.getElementById('gameScreen').parentElement;
+      container.classList.add('fullscreen');
+
+      const header = container.querySelector('.game-select-header');
+      if (header) {
+        header.classList.remove('game-select-header');
       }
 
-      if (container.readyRoom) {
-        container.readyRoom.className = container.readyRoom.className
-          .replace('ready-room-row', '')
-          .trim();
+      const readyRoom = container.querySelector('.ready-room-row');
+      if (readyRoom) {
+        readyRoom.classList.remove('ready-room-row');
       }
     }
 
