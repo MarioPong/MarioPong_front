@@ -264,6 +264,16 @@
       document.getElementById('roomNameDisplay').textContent = currentRoom || '(Room name)';
     });
 
+    function startGameUI() {
+      const container = document.getElementById('gameScreen').parentElement;
+      container.classList.add('fullscreen');
+    }
+
+    function resetGameUI() {
+      const container = document.getElementById('gameScreen').parentElement;
+      container.classList.remove('fullscreen');
+    }
+
     // --- 버튼 이벤트 ---
     document.getElementById('joinBtn').onclick = function () {
       const value = document.getElementById('roomInput').value.trim();
@@ -294,13 +304,14 @@
       document.getElementById('readyBtn').disabled = true;
     };
     document.getElementById('toLobbyBtn').onclick = function () { location.reload(); };
-    document.getElementById('toLobbyBtnModal').onclick = function () { location.reload(); };
+    document.getElementById('toLobbyBtnModal').onclick = function () { resetGameUI();location.reload(); };
     document.getElementById('exitGameBtn').onclick = function () {
       socket.emit('leaveRoom', currentRoom);
       joined = false; currentRoom = null;
       document.getElementById('gameScreen').style.display = 'none';
       document.getElementById('readyBtn').disabled = false;
       document.getElementById('leaveBtn').disabled = false;
+      resetGameUI()
     };
     // --- 상태/게임이동/스킬바 ---
     socket.on('enteredRoom', (index) => {
@@ -313,6 +324,7 @@
       document.getElementById('status').innerText = 'Ready! Waiting for...';
     });
     socket.on('startGame', () => {
+      startGameUI();
       document.querySelector('.ready-main-row').style.display = 'none';
       document.getElementById('gameScreen').style.display = 'block';
       document.getElementById('skillBarContainer').style.display = 'block';

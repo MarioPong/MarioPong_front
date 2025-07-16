@@ -58,6 +58,16 @@ html {
   justify-content: center;
 }
 
+.game-select-card.fullscreen {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  transition: all 0.3s ease;
+}
+
 
 .game-select-header {
   position: relative;
