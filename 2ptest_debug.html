@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pong PvP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- 스타일 -->
+  <link rel="stylesheet" href="css/style_gameSelect.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.min.js"></script>
+  <style>
+    #pongCanvas {
+      display: block;
+      background: black;
+      border: 2px solid #fff;
+      width: 100vw;
+      height: 100vh;
+      touch-action: none;
+    }
+    #gameScreen {
+      display: none;
+    }
+    #blindOverlay, #resultModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      justify-content: center;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 2000;
+    }
+    #resultBox {
+      background: #ffe7a3; padding: 48px; border-radius: 24px;
+      font-family: 'Press Start 2P', monospace;
+      text-align: center;
+    }
+    #toLobbyBtn, #toLobbyBtnModal {
+      margin-top: 20px; padding: 14px 28px;
+      font-family: inherit;
+      background: #e04d45; color: white;
+      border: none; border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="lobbyScreen">
+    <h1>Pong PvP - Room</h1>
+    <input id="roomInput" placeholder="Enter room name" />
+    <button id="joinBtn">Join Room</button>
+    <div id="status"></div>
+    <div id="error" style="color:red;"></div>
+    <button id="readyBtn" disabled>Ready</button>
+    <button id="leaveBtn" disabled>Leave</button>
+  </div>
+
+  <div id="gameScreen">
+    <canvas id="pongCanvas"></canvas>
+    <button id="exitGameBtn">Leave Game</button>
+  </div>
+
+  <div id="skillBarContainer" style="display: none; width:300px; margin: 0 auto;">
+    <div style="background:#444; height: 24px; border-radius: 12px;">
+      <div id="skillBar" style="background:#3fcf3f; height:100%; width:0%; transition: width 0.3s;"></div>
+    </div>
+    <div id="skillLabel" style="text-align: center; margin-top: 5px;">쿨타임</div>
+  </div>
+
+  <div id="blindOverlay">
+    <img src="img/item/blooper.png" style="max-width:80%; max-height:80%; opacity:0.9;" />
+  </div>
+
+  <div id="resultModal">
+    <div id="resultBox">
+      <h2 id="resultTitle"></h2>
+      <p id="resultScore"></p>
+      <button id="toLobbyBtnModal">Return to Lobby</button>
+    </div>
+  </div>
+
+  <script>
+    const socket = io("https://mariopong-back-4cre.onrender.com/pong");
+
+    // 상태 변수
+    let joined = false;
+    let currentRoom = null;
+    let myPaddleIndex = null;
+    let gameActive = false;
+
+    let skillCooldown = 10;
+    let lastSkillTime = 0;
+    let skillReady = false;
+
+    const canvas = document.getElementById("pongCanvas");
+    const context = canvas.getContext("2d");
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight * 0.58;
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    document.getElementById("joinBtn").onclick = () => {
+      const room = document.getElementById("roomInput").value.trim();
+      if (!room) {
+        document.getElementById("error").textContent = "Room name required";
+        return;
+      }
+      console.log("[emit] joinRoom", room);
+      socket.emit("joinRoom", room, "Player");
+      currentRoom = room;
+    };
+
+    document.getElementById("readyBtn").onclick = () => {
+      console.log("[emit] ready");
+      socket.emit("ready", "Mario");
+      document.getElementById("readyBtn").disabled = true;
+    };
+
+    document.getElementById("leaveBtn").onclick = () => {
+      if (currentRoom) {
+        console.log("[emit] leaveRoom", currentRoom);
+        socket.emit("leaveRoom", currentRoom);
+        resetToLobby();
+      }
+    };
+
+    document.getElementById("exitGameBtn").onclick = () => {
+      if (currentRoom) {
+        console.log("[emit] leaveGame from canvas");
+        socket.emit("leaveRoom", currentRoom);
+        resetToLobby();
+      }
+    };
+
+    document.getElementById("toLobbyBtnModal").onclick = () => {
+      resetToLobby();
+    };
+
+    // socket 이벤트
+    socket.on("enteredRoom", (index) => {
+      console.log("[socket] enteredRoom", index);
+      myPaddleIndex = index;
+      joined = true;
+      document.getElementById("readyBtn").disabled = false;
+      document.getElementById("leaveBtn").disabled = false;
+      document.getElementById("status").textContent = "Room joined!";
+    });
+
+    socket.on("waiting", () => {
+      console.log("[socket] waiting");
+      document.getElementById("status").textContent = "Waiting for another player...";
+    });
+
+    socket.on("startGame", () => {
+      console.log("[socket] startGame");
+      document.getElementById("lobbyScreen").style.display = "none";
+      document.getElementById("gameScreen").style.display = "block";
+      document.getElementById("skillBarContainer").style.display = "block";
+      gameActive = true;
+      lastSkillTime = Date.now() - skillCooldown * 1000;
+    });
+
+    socket.on("gameOver", ({ winner, score }) => {
+      console.log("[socket] gameOver", winner, score);
+      gameActive = false;
+      document.getElementById("skillBarContainer").style.display = "none";
+      showResultModal(winner, score);
+    });
+
+    socket.on("disconnect", () => {
+      console.log("[socket] disconnect");
+      resetToLobby();
+    });
+
+    socket.on("gameState", (state) => {
+      window.lastGameState = state;
+      renderGame(state);
+    });
+
+    socket.on("blindEffect", ({ duration }) => {
+      console.log("[socket] blindEffect", duration);
+      const overlay = document.getElementById("blindOverlay");
+      overlay.style.display = "flex";
+      setTimeout(() => {
+        overlay.style.display = "none";
+      }, duration || 1000);
+    });
+
+    function renderGame(state) {
+      const cw = canvas.width;
+      const ch = canvas.height;
+      context.clearRect(0, 0, cw, ch);
+
+      // middle dashed line
+      context.beginPath();
+      context.setLineDash([5]);
+      context.moveTo(cw / 2, 0);
+      context.lineTo(cw / 2, ch);
+      context.strokeStyle = "grey";
+      context.stroke();
+      context.setLineDash([]);
+
+      // paddles
+      const p0h = (state.paddleHeight?.[0] || 75) / 500 * ch;
+      const p1h = (state.paddleHeight?.[1] || 75) / 500 * ch;
+      const y0 = state.paddleY?.[0] / 500 * ch;
+      const y1 = state.paddleY?.[1] / 500 * ch;
+      const pw = 10 / 700 * cw;
+      context.fillStyle = "white";
+      context.fillRect(cw * 0.03, y0, pw, p0h);
+      context.fillRect(cw * 0.97 - pw, y1, pw, p1h);
+
+      // ball
+      const ballX = (state.ballX / 700) * cw;
+      const ballY = (state.ballY / 500) * ch;
+      context.beginPath();
+      context.arc(ballX, ballY, 12, 0, Math.PI * 2);
+      context.fill();
+
+      // score
+      context.font = `${Math.floor(ch * 0.08)}px monospace`;
+      context.fillText(state.score?.[0] ?? "0", cw * 0.25, ch * 0.1);
+      context.fillText(state.score?.[1] ?? "0", cw * 0.75, ch * 0.1);
+    }
+
+    function showResultModal(winner, score) {
+      console.log("[Modal] Game Over", winner, score);
+      document.getElementById("resultTitle").textContent = myPaddleIndex === winner ? "Victory!" : "Defeat...";
+      document.getElementById("resultScore").textContent = `${score[0]} : ${score[1]}`;
+      document.getElementById("resultModal").style.display = "flex";
+    }
+
+    canvas.addEventListener("mousemove", (e) => {
+      if (!gameActive || myPaddleIndex === null) return;
+      const rect = canvas.getBoundingClientRect();
+      let y = e.clientY - rect.top;
+      socket.emit("paddleMove", { yPosition: y / canvas.height * 500 });
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.code === "Space" && skillReady && gameActive) {
+        console.log("[emit] useSkill");
+        socket.emit("useSkill");
+        lastSkillTime = Date.now();
+        skillReady = false;
+        updateSkillBar();
+      }
+    });
+
+    function resetToLobby() {
+      joined = false;
+      gameActive = false;
+      myPaddleIndex = null;
+      currentRoom = null;
+      document.getElementById("lobbyScreen").style.display = "block";
+      document.getElementById("gameScreen").style.display = "none";
+      document.getElementById("resultModal").style.display = "none";
+      document.getElementById("skillBarContainer").style.display = "none";
+      document.getElementById("status").textContent = "Returned to lobby.";
+    }
+
+    function updateSkillBar() {
+      const elapsed = (Date.now() - lastSkillTime) / 1000;
+      const percent = Math.min(1, elapsed / skillCooldown);
+      document.getElementById("skillBar").style.width = percent * 100 + "%";
+      skillReady = percent >= 1;
+      document.getElementById("skillLabel").textContent =
+        skillReady ? "Skill Ready! (Space)" : `Cooldown: ${Math.ceil(skillCooldown - elapsed)}s`;
+    }
+
+    setInterval(updateSkillBar, 100);
+  </script>
+</body>
+</html>
