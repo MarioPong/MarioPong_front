@@ -101,6 +101,22 @@
     // Top10 버튼
     document.getElementById('top10Btn').onclick = function () {
 
+      const top10 = JSON.parse(localStorage.getItem('top10') || '[]');
+      let html = '';
+      if (top10.length === 0) {
+        html = 'No top10 data.';
+      } else {
+
+        let sorted = top10.slice().sort((a, b) => b.score - a.score);
+        html = '<b>Top 10</b><br><table style="margin:0 auto; font-size:1.1em;">';
+        sorted.slice(0, 10).forEach((user, i) => {
+          html += `<tr><td style='padding:4px 18px 4px 0; text-align:right;'>${user.name}</td><td style='padding:4px 0 4px 18px; text-align:left;'>${user.score}</td></tr>`;
+        });
+        html += '</table>';
+      }
+      document.getElementById('top10Score').innerHTML = '';
+      document.getElementById('top10List').innerHTML = html;
+      document.getElementById('top10Modal').style.display = 'flex';
     };
 
     // Records 버튼 
