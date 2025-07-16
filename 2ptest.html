@@ -264,9 +264,19 @@
       document.getElementById('roomNameDisplay').textContent = currentRoom || '(Room name)';
     });
 
-    function startGameUI() {
+    function startGameUI() { // Delete
       const container = document.getElementById('gameScreen').parentElement;
       container.classList.add('fullscreen');
+
+      const header = container.querySelector('.game-select-header');
+      if (header) {
+        header.classList.remove('game-select-header');
+      }
+
+      const readyRoom = container.querySelector('.ready-room-row');
+      if (readyRoom) {
+        readyRoom.classList.remove('ready-room-row');
+      }
     }
 
     function resetGameUI() {
