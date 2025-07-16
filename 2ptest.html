@@ -100,7 +100,7 @@
       <!-- 헤더 -->
       <div class="game-select-header">
         <button class="back-btn" onclick="goBack()">Back</button>
-        <button class="back-btn" id="toLobbyBtn" style="position:absolute;left:30px;top:30px;">Lobby</button>
+        <button class="back-btn" id="toLobbyBtn" style="position:absolute;left:10px;top:10px;">Lobby</button>
         <span class="game-select-title" id="roomTitle">Ready</span>
       </div>
       <!-- 카드 내부 컨텐츠 -->
@@ -142,9 +142,12 @@
           </div>
         </div>
         <!-- 에러/상태 메시지 -->
-        <div id="status" style="margin:18px 0 0 0; color:#20a010; font-size:1.1em;"></div>
-        <div id="error" style="color:#e04d45; font-size:1.1em;"></div>
-        <div id="roomInfoBox" style="display:none;"></div>
+        <div
+          style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; margin-top: 18px;">
+          <div id="status" style="color:#20a010; font-size:1.1em;"></div>
+          <div id="error" style="color:#e04d45; font-size:1.1em;"></div>
+          <div id="roomInfoBox" style="display:none;"></div>
+        </div>
 
         <!-- 스킬 쿨타임 바 -->
         <div id="skillBarContainer" style="margin:30px auto 0 auto; width:320px;display: none;">
@@ -296,7 +299,7 @@
     };
     // --- 상태/게임이동/스킬바 ---
     socket.on('enteredRoom', (index) => {
-      document.getElementById('status').innerText = 'You have entered the room. Please press the ready button!';
+      document.getElementById('status').innerText = 'Please press the ready button!';
       document.getElementById('readyBtn').disabled = false;
       document.getElementById('leaveBtn').disabled = false;
       joined = true; myPaddleIndex = index;
