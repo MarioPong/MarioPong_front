@@ -152,14 +152,14 @@
   </div>
 
   <div id="blindOverlay"
-      style="display:none; position:absolute; top:0; left:0; width:100vw; height:100vh; z-index:1000; background:rgba(0,0,0,0.7); justify-content:center; align-items:center;">
+    style="display:none; position:absolute; top:0; left:0; width:100vw; height:100vh; z-index:1000; background:rgba(0,0,0,0.7); justify-content:center; align-items:center;">
     <img src="./img/item/blooper.png" style="max-width:80vw; max-height:80vh; opacity:0.95;">
   </div>
 
 
   <script>
     // ====== 설정 ======
-    const socket = io('https://mariopong-back-4cre.onrender.com/pong');
+    const socket = io('https://back-nogoogle.onrender.com/pong');
     let joined = false;
     let currentRoom = null;
     let myPaddleIndex = null;
@@ -421,7 +421,7 @@
       context.fillStyle = 'white';
       context.fill();
 
-      for (const ball of state.fakeBalls){
+      for (const ball of state.fakeBalls) {
         context.beginPath();
         context.arc(ball.x, ball.y, Math.min(cw, ch) * 0.02, 0, 2 * Math.PI, false);
         context.fillStyle = 'white';

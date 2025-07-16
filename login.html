@@ -31,7 +31,7 @@
             </div>
             <button type="submit" class="login-btn">Login</button>
             <div class="google-login-wrapper">
-              <a href="https://mariopong-back-4cre.onrender.com/auth/google">
+              <a href="https://back-nogoogle.onrender.com/auth/google">
                 <img src="img/google.png" alt="Google" class="google-img" />
               </a>
             </div>
@@ -57,7 +57,7 @@
       const inputEmail = document.getElementById('email').value.trim();
       const inputPw = document.getElementById('password').value;
 
-      fetch('https://mariopong-back-4cre.onrender.com/api/user/login', {
+      fetch('https://back-nogoogle.onrender.com/api/user/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

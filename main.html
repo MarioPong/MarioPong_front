@@ -83,7 +83,7 @@
       let wins = localStorage.getItem('wins');
       let losses = localStorage.getItem('losses');
 
-      fetch('https://mariopong-back-4cre.onrender.com/api/user/update', {
+      fetch('https://back-nogoogle.onrender.com/api/user/update', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -112,7 +112,7 @@
         });
 
       event.preventDefault();
-      fetch('https://mariopong-back-4cre.onrender.com/api/user/logout', {
+      fetch('https://back-nogoogle.onrender.com/api/user/logout', {
         method: 'GET',
         credentials: 'include'
       })
