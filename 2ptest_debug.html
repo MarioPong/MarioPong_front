@@ -1,277 +1,162 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <title>Pong PvP</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- 스타일 -->
-  <link rel="stylesheet" href="css/style_gameSelect.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.min.js"></script>
+  <meta charset="UTF-8">
+  <title>디버그용 멀티플레이 로비</title>
   <style>
-    #pongCanvas {
-      display: block;
-      background: black;
-      border: 2px solid #fff;
-      width: 100vw;
-      height: 100vh;
-      touch-action: none;
-    }
-    #gameScreen {
-      display: none;
-    }
-    #blindOverlay, #resultModal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      justify-content: center;
-      align-items: center;
-      background: rgba(0, 0, 0, 0.7);
-      z-index: 2000;
-    }
-    #resultBox {
-      background: #ffe7a3; padding: 48px; border-radius: 24px;
-      font-family: 'Press Start 2P', monospace;
-      text-align: center;
-    }
-    #toLobbyBtn, #toLobbyBtnModal {
-      margin-top: 20px; padding: 14px 28px;
-      font-family: inherit;
-      background: #e04d45; color: white;
-      border: none; border-radius: 8px;
-      cursor: pointer;
-    }
+    body { font-family: sans-serif; background: #ececec; margin: 0; }
+    #container { max-width: 500px; margin: 40px auto; background: #fff; padding: 30px; box-shadow: 0 2px 8px #bbb; }
+    h1 { font-size: 1.5em; color: #3b4cca; }
+    .section { margin-bottom: 20px; }
+    #logs { height: 120px; overflow-y: auto; border: 1px solid #bbb; background: #0a0; color: #fff; padding: 7px; font-size: 0.93em; margin-bottom: 10px; }
+    input[type=text] { padding: 6px; width: 60%; margin-right: 7px; }
+    button { padding: 6px 12px; background: #3b4cca; color: #fff; border: none; border-radius: 4px; }
+    button:disabled { opacity: 0.6; }
+    #players { border: 1px solid #bbb; padding: 5px; min-height: 32px; background: #fafaf8; margin-bottom: 12px; }
+    .status { font-size: 1em; margin-bottom: 10px; }
+    .ready { color: #09c909; }
+    .not-ready { color: #f45959; }
   </style>
+  <!-- socket.io client 라이브러리 필요: 서버와 버전에 맞게 소스를 불러오세요 -->
+  <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
-  <div id="lobbyScreen">
-    <h1>Pong PvP - Room</h1>
-    <input id="roomInput" placeholder="Enter room name" />
-    <button id="joinBtn">Join Room</button>
-    <div id="status"></div>
-    <div id="error" style="color:red;"></div>
-    <button id="readyBtn" disabled>Ready</button>
-    <button id="leaveBtn" disabled>Leave</button>
-  </div>
+  <div id="container">
+    <h1>디버깅용 멀티 로비</h1>
 
-  <div id="gameScreen">
-    <canvas id="pongCanvas"></canvas>
-    <button id="exitGameBtn">Leave Game</button>
-  </div>
-
-  <div id="skillBarContainer" style="display: none; width:300px; margin: 0 auto;">
-    <div style="background:#444; height: 24px; border-radius: 12px;">
-      <div id="skillBar" style="background:#3fcf3f; height:100%; width:0%; transition: width 0.3s;"></div>
+    <div class="section">
+      <div>연결 상태: <span id="connState" class="status not-ready">연결 대기중...</span></div>
+      <div id="logs"></div>
     </div>
-    <div id="skillLabel" style="text-align: center; margin-top: 5px;">쿨타임</div>
-  </div>
 
-  <div id="blindOverlay">
-    <img src="img/item/blooper.png" style="max-width:80%; max-height:80%; opacity:0.9;" />
-  </div>
+    <div class="section">
+      <div>
+        <input type="text" id="roomInput" placeholder="방 이름(입력/생성)">
+        <button id="joinBtn">접속/생성</button>
+        <button id="leaveBtn" disabled>퇴장</button>
+      </div>
+    </div>
 
-  <div id="resultModal">
-    <div id="resultBox">
-      <h2 id="resultTitle"></h2>
-      <p id="resultScore"></p>
-      <button id="toLobbyBtnModal">Return to Lobby</button>
+    <div class="section">
+      <div>현재 방: <span id="roomName">-</span></div>
+      <div>플레이어 목록:</div>
+      <div id="players">없음</div>
+    </div>
+    <div class="section">
+      <button id="readyBtn" disabled>READY</button>
     </div>
   </div>
 
   <script>
-    const socket = io("https://mariopong-back-4cre.onrender.com/pong");
-
-    // 상태 변수
-    let joined = false;
-    let currentRoom = null;
-    let myPaddleIndex = null;
-    let gameActive = false;
-
-    let skillCooldown = 10;
-    let lastSkillTime = 0;
-    let skillReady = false;
-
-    const canvas = document.getElementById("pongCanvas");
-    const context = canvas.getContext("2d");
-
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight * 0.58;
+    // 클라이언트 로직
+    const socket = io();
+    const logs = document.getElementById('logs');
+    function log(txt) {
+      logs.innerHTML += txt + '<br>';
+      logs.scrollTop = logs.scrollHeight;
+      console.log('[SOCKET-LOG]', txt);
     }
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
 
-    document.getElementById("joinBtn").onclick = () => {
-      const room = document.getElementById("roomInput").value.trim();
-      if (!room) {
-        document.getElementById("error").textContent = "Room name required";
+    // 디버깅용 전역 socket 이벤트 로깅
+    const eventsToLog = [
+      'connect', 'disconnect', 'reconnect', 'connect_error',
+      'room_joined', 'room_left', 'player_update', 'ready_state',
+      // 서버에서 사용하는 추가 이벤트명도 여기에 등록 추천
+    ];
+    for (const evt of eventsToLog) {
+      socket.on(evt, (...args) => {
+        log(`수신: ${evt} | 데이터: ${JSON.stringify(args)}`);
+      });
+    }
+
+    // 상태 UI 핸들러
+    socket.on('connect', () => {
+      document.getElementById('connState').textContent = '연결됨';
+      document.getElementById('connState').className = 'status ready';
+      document.getElementById('joinBtn').disabled = false;
+      log('Socket 연결 성공');
+    });
+    socket.on('disconnect', () => {
+      document.getElementById('connState').textContent = '연결 해제됨';
+      document.getElementById('connState').className = 'status not-ready';
+      log('Socket 연결 해제');
+      document.getElementById('joinBtn').disabled = false;
+      document.getElementById('leaveBtn').disabled = true;
+      document.getElementById('readyBtn').disabled = true;
+      updateRoomInfo(null, []);
+    });
+
+    // 방 입장/퇴장 처리
+    document.getElementById('joinBtn').onclick = () => {
+      const room = document.getElementById('roomInput').value.trim();
+      if (room) {
+        socket.emit('join_room', { room });
+        log('요청: join_room - ' + room);
+      }
+    };
+    document.getElementById('leaveBtn').onclick = () => {
+      socket.emit('leave_room');
+      log('요청: leave_room');
+    };
+
+    // 준비 상태 토글
+    document.getElementById('readyBtn').onclick = () => {
+      socket.emit('toggle_ready');
+      log('요청: toggle_ready');
+    };
+
+    // 방에 입장하면 서버에서 room_joined 이벤트와 함께 방, 플레이어 정보를 주는 구조 예시
+    socket.on('room_joined', ({ room, players }) => {
+      updateRoomInfo(room, players);
+      document.getElementById('leaveBtn').disabled = false;
+      document.getElementById('readyBtn').disabled = false;
+      document.getElementById('joinBtn').disabled = true;
+      log('방에 입장: ' + room);
+    });
+    socket.on('room_left', () => {
+      updateRoomInfo(null, []);
+      document.getElementById('leaveBtn').disabled = true;
+      document.getElementById('readyBtn').disabled = true;
+      document.getElementById('joinBtn').disabled = false;
+      log('방 나가기 완료');
+    });
+
+    // 플레이어 목록 갱신
+    socket.on('player_update', ({ players }) => {
+      updatePlayers(players);
+    });
+
+    // ready 상태 안내 (예시용)
+    socket.on('ready_state', ({ ready }) => {
+      log('[플레이어 준비상태 업데이트]: ' + ready);
+    });
+
+    function updateRoomInfo(room, players) {
+      document.getElementById('roomName').textContent = room || '-';
+      updatePlayers(players || []);
+    }
+    function updatePlayers(players) {
+      // players: [{nickname, ready}, ...]
+      if (!players || !players.length) {
+        document.getElementById('players').textContent = '없음';
         return;
       }
-      console.log("[emit] joinRoom", room);
-      socket.emit("joinRoom", room, "Player");
-      currentRoom = room;
-    };
-
-    document.getElementById("readyBtn").onclick = () => {
-      console.log("[emit] ready");
-      socket.emit("ready", "Mario");
-      document.getElementById("readyBtn").disabled = true;
-    };
-
-    document.getElementById("leaveBtn").onclick = () => {
-      if (currentRoom) {
-        console.log("[emit] leaveRoom", currentRoom);
-        socket.emit("leaveRoom", currentRoom);
-        resetToLobby();
-      }
-    };
-
-    document.getElementById("exitGameBtn").onclick = () => {
-      if (currentRoom) {
-        console.log("[emit] leaveGame from canvas");
-        socket.emit("leaveRoom", currentRoom);
-        resetToLobby();
-      }
-    };
-
-    document.getElementById("toLobbyBtnModal").onclick = () => {
-      resetToLobby();
-    };
-
-    // socket 이벤트
-    socket.on("enteredRoom", (index) => {
-      console.log("[socket] enteredRoom", index);
-      myPaddleIndex = index;
-      joined = true;
-      document.getElementById("readyBtn").disabled = false;
-      document.getElementById("leaveBtn").disabled = false;
-      document.getElementById("status").textContent = "Room joined!";
-    });
-
-    socket.on("waiting", () => {
-      console.log("[socket] waiting");
-      document.getElementById("status").textContent = "Waiting for another player...";
-    });
-
-    socket.on("startGame", () => {
-      console.log("[socket] startGame");
-      document.getElementById("lobbyScreen").style.display = "none";
-      document.getElementById("gameScreen").style.display = "block";
-      document.getElementById("skillBarContainer").style.display = "block";
-      gameActive = true;
-      lastSkillTime = Date.now() - skillCooldown * 1000;
-    });
-
-    socket.on("gameOver", ({ winner, score }) => {
-      console.log("[socket] gameOver", winner, score);
-      gameActive = false;
-      document.getElementById("skillBarContainer").style.display = "none";
-      showResultModal(winner, score);
-    });
-
-    socket.on("disconnect", () => {
-      console.log("[socket] disconnect");
-      resetToLobby();
-    });
-
-    socket.on("gameState", (state) => {
-      window.lastGameState = state;
-      renderGame(state);
-    });
-
-    socket.on("blindEffect", ({ duration }) => {
-      console.log("[socket] blindEffect", duration);
-      const overlay = document.getElementById("blindOverlay");
-      overlay.style.display = "flex";
-      setTimeout(() => {
-        overlay.style.display = "none";
-      }, duration || 1000);
-    });
-
-    function renderGame(state) {
-      const cw = canvas.width;
-      const ch = canvas.height;
-      context.clearRect(0, 0, cw, ch);
-
-      // middle dashed line
-      context.beginPath();
-      context.setLineDash([5]);
-      context.moveTo(cw / 2, 0);
-      context.lineTo(cw / 2, ch);
-      context.strokeStyle = "grey";
-      context.stroke();
-      context.setLineDash([]);
-
-      // paddles
-      const p0h = (state.paddleHeight?.[0] || 75) / 500 * ch;
-      const p1h = (state.paddleHeight?.[1] || 75) / 500 * ch;
-      const y0 = state.paddleY?.[0] / 500 * ch;
-      const y1 = state.paddleY?.[1] / 500 * ch;
-      const pw = 10 / 700 * cw;
-      context.fillStyle = "white";
-      context.fillRect(cw * 0.03, y0, pw, p0h);
-      context.fillRect(cw * 0.97 - pw, y1, pw, p1h);
-
-      // ball
-      const ballX = (state.ballX / 700) * cw;
-      const ballY = (state.ballY / 500) * ch;
-      context.beginPath();
-      context.arc(ballX, ballY, 12, 0, Math.PI * 2);
-      context.fill();
-
-      // score
-      context.font = `${Math.floor(ch * 0.08)}px monospace`;
-      context.fillText(state.score?.[0] ?? "0", cw * 0.25, ch * 0.1);
-      context.fillText(state.score?.[1] ?? "0", cw * 0.75, ch * 0.1);
+      document.getElementById('players').innerHTML = players.map(
+        p => `${p.nickname} <span style="color:${
+          p.ready ? '#09c909' : '#f45959'
+        };font-weight:bold;">[${p.ready ? 'READY' : 'NOT READY'}]</span>`
+      ).join('<br>');
     }
 
-    function showResultModal(winner, score) {
-      console.log("[Modal] Game Over", winner, score);
-      document.getElementById("resultTitle").textContent = myPaddleIndex === winner ? "Victory!" : "Defeat...";
-      document.getElementById("resultScore").textContent = `${score[0]} : ${score[1]}`;
-      document.getElementById("resultModal").style.display = "flex";
-    }
+    // 유용한 추가 디버깅 요소 (네트워크 딜레이 테스트 등)
+    // 소켓 지연 시뮬레이션 버튼 만드는 것도 가능
 
-    canvas.addEventListener("mousemove", (e) => {
-      if (!gameActive || myPaddleIndex === null) return;
-      const rect = canvas.getBoundingClientRect();
-      let y = e.clientY - rect.top;
-      socket.emit("paddleMove", { yPosition: y / canvas.height * 500 });
-    });
+    // (선택 사항) LocalStorage.debug 등 Socket.IO 디버깅 문법 활용
+    try {
+      localStorage.debug = '*';
+      log('localStorage.debug = "*"으로 세팅');
+    } catch(e) {}
 
-    document.addEventListener("keydown", (e) => {
-      if (e.code === "Space" && skillReady && gameActive) {
-        console.log("[emit] useSkill");
-        socket.emit("useSkill");
-        lastSkillTime = Date.now();
-        skillReady = false;
-        updateSkillBar();
-      }
-    });
-
-    function resetToLobby() {
-      joined = false;
-      gameActive = false;
-      myPaddleIndex = null;
-      currentRoom = null;
-      document.getElementById("lobbyScreen").style.display = "block";
-      document.getElementById("gameScreen").style.display = "none";
-      document.getElementById("resultModal").style.display = "none";
-      document.getElementById("skillBarContainer").style.display = "none";
-      document.getElementById("status").textContent = "Returned to lobby.";
-    }
-
-    function updateSkillBar() {
-      const elapsed = (Date.now() - lastSkillTime) / 1000;
-      const percent = Math.min(1, elapsed / skillCooldown);
-      document.getElementById("skillBar").style.width = percent * 100 + "%";
-      skillReady = percent >= 1;
-      document.getElementById("skillLabel").textContent =
-        skillReady ? "Skill Ready! (Space)" : `Cooldown: ${Math.ceil(skillCooldown - elapsed)}s`;
-    }
-
-    setInterval(updateSkillBar, 100);
   </script>
 </body>
 </html>
