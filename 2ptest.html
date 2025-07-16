@@ -14,13 +14,17 @@
   <style>
     /* 특수: canvas와 overlay 보정 */
     #pongCanvas {
-      aspect-ratio: 4 / 3;
-      width: 90vw;
-      max-width: 800px;
-      background: black;
-      margin: 0 auto;
       display: block;
+      margin: 0 auto;
+      background: #000;
+      border: 3px solid #fffbe6;
+      border-radius: 12px;
+      width: 90vw;
+      height: 80vh;
+      max-width: 1200px;
+      max-height: 90vh;
       box-shadow: 0 4px 32px rgba(0, 0, 0, 0.18);
+      position: relative;
     }
 
     #blindOverlay {
