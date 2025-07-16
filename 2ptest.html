@@ -202,6 +202,11 @@
     let characters = JSON.parse(localStorage.getItem('characters') || '["Mario"]');
     let skillCooldown = 10, lastSkillTime = 0, skillReady = false;
     let myCharacter = localStorage.getItem('character_now') || characters[0];
+    let gold = localStorage.getItem('gold');
+    let score = localStorage.getItem('score');
+    let records = JSON.parse(localStorage.getItem('records') || '[]');
+    let wins = localStorage.getItem('wins');
+    let losses = localStorage.getItem('losses');
 
     // --- 준비/로비 기본 화면 표시 ---
     document.getElementById('gameScreen').style.display = 'none';
@@ -327,6 +332,34 @@
     socket.on('gameOver', (data) => {
       gameActive = false; showResultModal(data.winner, data.score);
       document.getElementById('skillBarContainer').style.display = 'none';
+      if (myPaddleIndex === data.winner) { // win
+        gold += 80;
+        score += 20;
+        wins += 1;
+        if (data.score[0]>data.score[1]){
+          records.push(data.score);
+        } else {
+          records.push([data.score[1], data.score[0]]);
+        }
+
+        localStorage.setItem('gold', gold);
+        localStorage.setItem('score', score);
+        localStorage.setItem('records', records);
+        localStorage.setItem('wins', wins);
+      } else { // lose
+        if(score>10) score -= 10;
+        else score=0;
+        losses += 1;
+        if (data.score[1]>data.score[0]){
+          records.push(data.score);
+        } else {
+          records.push([data.score[1], data.score[0]]);
+        }
+
+        localStorage.setItem('score', score);
+        localStorage.setItem('records', records);
+        localStorage.setItem('losses', losses);
+      }
     });
     socket.on('disconnect', () => {
       document.getElementById('status').innerText = 'Server disconnected';
