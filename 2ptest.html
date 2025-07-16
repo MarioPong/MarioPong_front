@@ -304,7 +304,7 @@
       document.getElementById('readyBtn').disabled = true;
     };
     document.getElementById('toLobbyBtn').onclick = function () { location.reload(); };
-    document.getElementById('toLobbyBtnModal').onclick = function () { resetGameUI();location.reload(); };
+    document.getElementById('toLobbyBtnModal').onclick = function () { resetGameUI(); location.reload(); };
     document.getElementById('exitGameBtn').onclick = function () {
       socket.emit('leaveRoom', currentRoom);
       joined = false; currentRoom = null;
@@ -333,6 +333,39 @@
     });
     socket.on('gameOver', (data) => {
       gameActive = false; showResultModal(data.winner, data.score);
+      if (myPaddleIndex === winner) { //win
+        gold += 80;
+        score += 20;
+        if (data.score[0] > data.score[1]) {
+          records.push(data.score);
+        } else {
+          records.push([data.score[1], data.score[0]]);
+        }
+        wins += 1;
+
+        localStorage.setItem('gold', gold);
+        localStorage.setItem('score', score);
+        localStorage.setItem('records', JSON.stringify(records));
+        localStorage.setItem('wins', wins);
+      } else {
+        gold += 40;
+        if (score > 10) {
+          score -= 10;
+        } else {
+          score = 0;
+        }
+        if (data.score[0] < data.score[1]) {
+          records.push(data.score);
+        } else {
+          records.push([data.score[1], data.score[0]]);
+        }
+        losses += 1;
+
+        localStorage.setItem('gold', gold);
+        localStorage.setItem('score', score);
+        localStorage.setItem('records', JSON.stringify(records));
+        localStorage.setItem('losses', losses);
+      }
       document.getElementById('skillBarContainer').style.display = 'none';
     });
     socket.on('disconnect', () => {
