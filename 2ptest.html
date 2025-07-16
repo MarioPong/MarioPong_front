@@ -315,6 +315,7 @@
       socket.emit('leaveRoom', currentRoom);
       joined = false; currentRoom = null;
       document.getElementById('gameScreen').style.display = 'none';
+      document.getElementById('skillBarContainer').style.display = 'none';
       document.getElementById('readyBtn').disabled = false;
       document.getElementById('leaveBtn').disabled = false;
       resetGameUI()
