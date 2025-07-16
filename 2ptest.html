@@ -13,18 +13,32 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.js" crossorigin="anonymous"></script>
   <style>
     /* 특수: canvas와 overlay 보정 */
+    #gameScreen {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 10000;
+      justify-content: center;
+      align-items: center;
+      background: none;
+    }
+
     #pongCanvas {
       display: block;
       margin: 0 auto;
       background: #000;
       border: 3px solid #fffbe6;
       border-radius: 12px;
-      width: 90vw;
+      width: 96vw;
       height: 80vh;
-      max-width: 1200px;
+      max-width: 1400px;
       max-height: 90vh;
       box-shadow: 0 4px 32px rgba(0, 0, 0, 0.18);
       position: relative;
+      z-index: 10001;
     }
 
     #blindOverlay {
@@ -163,7 +177,7 @@
         </div>
 
         <!-- 게임 화면(숨김) 및 캔버스 -->
-        <div id="gameScreen" style="display:none;">
+        <div id="gameScreen">
           <canvas id="pongCanvas"></canvas>
           <button class="ready-action-btn leave" id="exitGameBtn" style="margin-top:18px;">Leave</button>
         </div>

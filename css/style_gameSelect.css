@@ -490,12 +490,14 @@ html {
   color: #1ebc2a;
   font-size: 1.3em;
   font-weight: bold;
+  font-family: 'Press Start 2P', 'DNFBitBitv2', 'Courier New', Courier, monospace;
 }
 
 .ready-x {
   color: #e04d45;
   font-size: 1.3em;
   font-weight: bold;
+  font-family: 'Press Start 2P', 'DNFBitBitv2', 'Courier New', Courier, monospace;
 }
 
 .ready-player-img-box {
