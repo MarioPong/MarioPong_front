@@ -44,15 +44,9 @@
           <!--local-->
           <span class="profile-value-display" id="profileUserScore"></span>
 
-          <div class="profile-info profile-rank">
-            <span>Rank</span>
-          </div>
-          <!--local-->
-          <span class="profile-value-display" id="profileUserRank"></span>
-
           <div class="profile-btn-row">
             <button class="profile-btn main" id="top10Btn">Top10</button>
-            <button class="profile-btn">Records</button>
+            <button class="profile-btn" id="recordsBtn">Records</button>
           </div>
         </div>
       </div>
@@ -61,10 +55,22 @@
         style="display:none; position:fixed; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); z-index:9999; justify-content:center; align-items:center;">
         <div
           style="background:#fffbe6; border-radius:18px; padding:40px 60px; min-width:320px; box-shadow:0 8px 32px #0006; text-align:center; font-family:'Press Start 2P', 'DNFBitBitv2', monospace;">
-          <h2 style="font-size:2rem; margin-bottom:18px; color:#2f2421;">Top 10 & Records</h2>
+          <h2 style="font-size:2rem; margin-bottom:18px; color:#2f2421;">Top 10 Records</h2>
           <div id="top10Score" style="font-size:1.2em; margin-bottom:18px;"></div>
-          <div id="top10Records" style="font-size:1em; color:#444;"></div>
+          <div id="top10List" style="font-size:1em; color:#444;"></div>
           <button onclick="document.getElementById('top10Modal').style.display='none'"
+            style="margin-top:24px; background:#e04d45; color:#fff; border:none; border-radius:8px; padding:12px 28px; font-size:1.1em; cursor:pointer;">Close</button>
+        </div>
+      </div>
+      <!-- Records 모달 -->
+      <div id="recordsModal"
+        style="display:none; position:fixed; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); z-index:9999; justify-content:center; align-items:center;">
+        <div
+          style="background:#fffbe6; border-radius:18px; padding:40px 60px; min-width:320px; box-shadow:0 8px 32px #0006; text-align:center; font-family:'Press Start 2P', 'DNFBitBitv2', monospace;">
+          <h2 style="font-size:2rem; margin-bottom:18px; color:#2f2421;">Records</h2>
+          <div id="recordsScore" style="font-size:1.2em; margin-bottom:18px;"></div>
+          <div id="recordsList" style="font-size:1em; color:#444;"></div>
+          <button onclick="document.getElementById('recordsModal').style.display='none'"
             style="margin-top:24px; background:#e04d45; color:#fff; border:none; border-radius:8px; padding:12px 28px; font-size:1.1em; cursor:pointer;">Close</button>
         </div>
       </div>
@@ -77,42 +83,47 @@
     let userId = localStorage.getItem('userId'); // e-mail
     let userGold = Number(localStorage.getItem('gold'));
     let userScore = Number(localStorage.getItem('score'));
-    let userRank = localStorage.getItem('userRank');
 
     const profileUserName = document.getElementById('profileUserName');
     const profileUserId = document.getElementById('profileUserId');
     const profileUserGold = document.getElementById('profileUserGold');
     const profileUserScore = document.getElementById('profileUserScore');
-    const profileUserRank = document.getElementById('profileUserRank');
 
     profileUserName.innerText = userName;
     profileUserId.innerText = userId;
     profileUserGold.innerText = userGold;
     profileUserScore.innerText = userScore;
-    profileUserRank.innerText = userRank;
 
     function goBack() {
       window.location.href = 'main.html';
     }
 
-    // Top10 버튼 기능
+    // Top10 버튼
     document.getElementById('top10Btn').onclick = function () {
+
+    };
+
+    // Records 버튼 
+    document.getElementById('recordsBtn').onclick = function () {
       const score = localStorage.getItem('score') || 0;
       const records = JSON.parse(localStorage.getItem('records') || '[]');
-      let html = `<b>Score:</b> ${score}`;
-      document.getElementById('top10Score').innerHTML = html;
+      let html = '';
+      document.getElementById('recordsScore').innerHTML = html;
       let recHtml = '';
       if (records.length === 0) {
         recHtml = 'No records yet.';
       } else {
-        recHtml = '<b>Records:</b><br><ol style="text-align:left;">';
+        recHtml = '<br>';
         records.slice(-10).reverse().forEach((rec, i) => {
-          recHtml += `<li> ${rec[0]} : ${rec[1]} </li>`;
+          let result = '';
+          if (rec[1] > rec[0]) result = '<b style="color:#20a010;">Win</b>';
+          else if (rec[1] < rec[0]) result = '<b style="color:#e04d45;">Loose</b>';
+          else result = '<b style="color:#888;">Draw</b>';
+          recHtml += `<div style="margin-bottom:6px;">${rec[0]} : ${rec[1]} <span style="margin-left:12px;">${result}</span></div>`;
         });
-        recHtml += '</ol>';
       }
-      document.getElementById('top10Records').innerHTML = recHtml;
-      document.getElementById('top10Modal').style.display = 'flex';
+      document.getElementById('recordsList').innerHTML = recHtml;
+      document.getElementById('recordsModal').style.display = 'flex';
     }
 
 
