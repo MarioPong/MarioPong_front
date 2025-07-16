@@ -391,8 +391,8 @@
     // --- 캔버스/게임 (for2ppl.html과 동일) ---
     const canvas = document.getElementById('pongCanvas'), context = canvas.getContext('2d');
     function resizeCanvas() {
-      canvas.width = canvas.offsetWidth; // canvas.width = window.innerWidth;
-      canvas.height = canvas.offsetHeight; // canvas.height = window.innerHeight * 0.58;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight * 0.58;
     }
 
     window.addEventListener('resize', resizeCanvas); resizeCanvas();
