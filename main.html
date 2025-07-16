@@ -30,15 +30,6 @@
     <button class="main-menu-logout" onclick="logOut(event)">logout</button>
   </div>
   <script>
-    localStorage.setItem('userId', result.userId);
-    localStorage.setItem('userName', result.username);
-    localStorage.setItem('gold', result.gold);
-    localStorage.setItem('score', result.score);
-    localStorage.setItem('characters', JSON.stringify(result.characters));
-    localStorage.setItem('records', JSON.stringify(result.records));
-    localStorage.setItem('wins', result.wins);
-    localStorage.setItem('losses', result.losses);
-    
     let userName = localStorage.getItem('userName');
 
     const userNameUp = document.getElementById('userName');
