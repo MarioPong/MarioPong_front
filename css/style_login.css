@@ -119,6 +119,16 @@ html {
   align-items: center;
 }
 
+.google-login-wrapper {
+  text-align: center;
+}
+
+.google-img {
+  width: 300px;
+  height: auto;
+  cursor: pointer;
+}
+
 .forgot-link {
   font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
   font-size: 0.8rem;
