@@ -342,7 +342,6 @@
           records.push([data.score[1], data.score[0]]);
         }
         wins += 1;
-
         localStorage.setItem('gold', gold);
         localStorage.setItem('score', score);
         localStorage.setItem('records', JSON.stringify(records));
@@ -366,6 +365,11 @@
         localStorage.setItem('records', JSON.stringify(records));
         localStorage.setItem('losses', losses);
       }
+      console.log(gold);
+      console.log(score);
+      console.log(records);
+      console.log(wins);
+      console.log(losses);
       document.getElementById('skillBarContainer').style.display = 'none';
     });
     socket.on('disconnect', () => {
