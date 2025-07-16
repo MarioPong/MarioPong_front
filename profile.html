@@ -108,7 +108,7 @@
       } else {
 
         let sorted = top10.slice().sort((a, b) => b.score - a.score);
-        html = '<b>Top 10</b><br><table style="margin:0 auto; font-size:1.1em;">';
+        html = '<br><table style="margin:0 auto; font-size:1.1em;">';
         sorted.slice(0, 10).forEach((user, i) => {
           html += `<tr><td style='padding:4px 18px 4px 0; text-align:right;'>${user.name}</td><td style='padding:4px 0 4px 18px; text-align:left;'>${user.score}</td></tr>`;
         });
